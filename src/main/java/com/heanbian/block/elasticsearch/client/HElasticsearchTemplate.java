@@ -189,7 +189,8 @@ public class HElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, getElasticsearchId(d)).doc(JSONObject.toJSONString(d), XContentType.JSON));
+			request.add(
+					new UpdateRequest(index, getElasticsearchId(d)).doc(JSONObject.toJSONString(d), XContentType.JSON));
 		});
 		return exec(this.bulkDocumentOpertor, request);
 	}
@@ -197,7 +198,7 @@ public class HElasticsearchTemplate {
 	public SearchResponse search(SearchSourceBuilder sourceBuilder, String... indices) {
 		return search(sourceBuilder, null, indices);
 	}
-	
+
 	public <T> List<T> search(SearchSourceBuilder sourceBuilder, String[] indices, Class<T> clazz) {
 		SearchResponse response = search(sourceBuilder, null, indices);
 		List<T> res = new ArrayList<>();
@@ -229,23 +230,21 @@ public class HElasticsearchTemplate {
 		return exec(searchScrollDocumentOpertor, request);
 	}
 
-	public <T extends HPage> HPageResult<T> searchByDeeppaging(HPaginationCondtion condtion,
-			Class<T> clazz) {
-		HPaginationCondtion queryCondtion = condtion;
+	public <T extends HPage> HPageResult<T> searchByDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
 		for (;;) {
-			HPaginationCondtionEntity entity = queryCondtion.calcPagenationCondtionEntity();
+			HPaginationCondtionEntity entity = condtion.calcPagenationCondtionEntity();
 
-			if (entity.getQueryFromValue() >= queryCondtion.getMaxQueryNum()) {
-				queryCondtion = queryCondtion.nextQueryCondion(entity.getSortOrder());
+			if (entity.getQueryFromValue() >= condtion.getMaxQueryNum()) {
+				condtion = condtion.nextQueryCondion(entity.getSortOrder());
 				continue;
 			}
 			if (entity.getQueryPageNo() != condtion.getInputPageNo()) {
-				queryCondtion.getEsPagenation().queryHits(this, entity, clazz);
-				queryCondtion = queryCondtion.getPreCondtion();
+				condtion.getPagination().searchHits(this, entity, clazz);
+				condtion = condtion.getPaginationCondtion();
 				continue;
 			}
 
-			return queryCondtion.getEsPagenation().query(this, entity, clazz);
+			return condtion.getPagination().search(this, entity, clazz);
 		}
 	}
 

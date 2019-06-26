@@ -6,8 +6,4 @@ public interface HExecutor {
 
 	public <E, R, S> S exec(HOperator<E, R, S> operator, R request);
 
-	public boolean isMonitor();
-
-	public void setMonitor(boolean monitor);
-
 }

@@ -134,19 +134,19 @@ public class HPagination implements Serializable {
 	}
 
 	public HPaginationCondtion createCondtion(int inputPageNumber, int inputPageSize) {
-		HPaginationCondtion currCondition = new HPaginationCondtion(inputPageNumber, inputPageSize);
-		currCondition.setEsPagenation(this);
-		return currCondition;
+		HPaginationCondtion c = new HPaginationCondtion(inputPageNumber, inputPageSize);
+		c.setPagination(this);
+		return c;
 	}
 
 	public HPaginationCondtion createCondtion(int inputPageNumber, int inputPageSize, QueryBuilder inputBuilder) {
-		HPaginationCondtion currCondition = new HPaginationCondtion(inputPageNumber, inputPageSize);
-		currCondition.setEsPagenation(this);
-		currCondition.setInputBuilder(inputBuilder);
-		return currCondition;
+		HPaginationCondtion c = new HPaginationCondtion(inputPageNumber, inputPageSize);
+		c.setPagination(this);
+		c.setInputBuilder(inputBuilder);
+		return c;
 	}
 
-	public <T extends HPage> SearchHit[] queryHits(HElasticsearchTemplate template,
+	public <T extends HPage> SearchHit[] searchHits(HElasticsearchTemplate template,
 			HPaginationCondtionEntity entity, Class<T> clazz) {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
@@ -190,15 +190,14 @@ public class HPagination implements Serializable {
 		return hits;
 	}
 
-	public <T extends HPage> HPageResult<T> query(HElasticsearchTemplate template,
+	public <T extends HPage> HPageResult<T> search(HElasticsearchTemplate template,
 			HPaginationCondtionEntity entity, Class<T> clazz) {
 		HPageResult<T> result = new HPageResult<>();
-		result.setList(queryHits(template, entity, clazz), clazz,
+		result.setList(searchHits(template, entity, clazz), clazz,
 				entity.getSortOrder() == SortOrder.DESC ? false : true);
 		result.setPageNumber(entity.getQueryPageNo());
 		result.setPageSize(entity.getQueryPageSize());
 		result.setTotal(total);
-
 		return result;
 	}
 
