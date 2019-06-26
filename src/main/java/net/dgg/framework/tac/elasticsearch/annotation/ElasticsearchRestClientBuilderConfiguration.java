@@ -12,18 +12,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticsearchRestClientBuilderConfiguration {
 
-	@Value("${es.cluster.nodes:}")
+	@Value("${elasticsearch.cluster.nodes:}")
 	private String cluster_nodes;
 	private HttpHost[] hosts;
 
 	@Bean
 	public RestClientBuilder getRestClientBuilder() {
-		String[] es_cluster_list = cluster_nodes.split(",");
-		hosts = new HttpHost[es_cluster_list.length];
-		for (int i = 0; i < es_cluster_list.length; i++) {
-			String ip = es_cluster_list[i].split(":")[0];
-			Integer port = Integer.valueOf(es_cluster_list[i].split(":")[1]);
-			hosts[i] = new HttpHost(ip, port);
+		String[] nodes = cluster_nodes.split(",");
+		hosts = new HttpHost[nodes.length];
+		for (int i = 0; i < nodes.length; i++) {
+			String[] s = nodes[i].split(":");
+			if (s.length == 2) {
+				hosts[i] = new HttpHost(s[0], Integer.valueOf(s[1]));
+			}
 		}
 		return RestClient.builder(hosts);
 	}
