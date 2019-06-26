@@ -1,12 +1,10 @@
-package net.dgg.framework.tac.elasticsearch.core.page.cache;
+package com.heanbian.block.elasticsearch.client.page;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.dgg.framework.tac.elasticsearch.core.page.HPaginationIdPair;
 
 @SuppressWarnings("serial")
 public class HMemoryPageCache implements HPageCache {

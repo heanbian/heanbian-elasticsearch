@@ -1,10 +1,10 @@
-package net.dgg.framework.tac.elasticsearch.core.executor;
+package com.heanbian.block.elasticsearch.client.executor;
 
 import java.io.IOException;
 
-import net.dgg.framework.tac.elasticsearch.core.operator.HOperator;
+import com.heanbian.block.elasticsearch.client.operator.HOperator;
 
-public class HRetryExecutor implements HExector {
+public class HRetryExecutor implements HExecutor {
 	private boolean monitor;
 	private HExecMonitor execMonitor;
 	private int retryNum;
@@ -41,7 +41,7 @@ public class HRetryExecutor implements HExector {
 			for (int count = retryNum; count >= 0; --count) {
 				try {
 					return operator.operator(operator.getRestClient(), request);
-				} catch (IOException io) {
+				} catch (IOException e) {
 					Thread.sleep(1000L);
 				}
 			}

@@ -1,4 +1,4 @@
-package net.dgg.framework.tac.elasticsearch.core.page;
+package com.heanbian.block.elasticsearch.client.page;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

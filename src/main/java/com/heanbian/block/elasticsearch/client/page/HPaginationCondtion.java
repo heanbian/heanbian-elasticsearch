@@ -1,13 +1,10 @@
 
-package net.dgg.framework.tac.elasticsearch.core.page;
+package com.heanbian.block.elasticsearch.client.page;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-
-import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageCache;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageGroup;
 
 public class HPaginationCondtion {
 	/** 查询输入页码 */

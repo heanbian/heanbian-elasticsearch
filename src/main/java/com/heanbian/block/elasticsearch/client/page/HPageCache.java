@@ -1,8 +1,6 @@
-package net.dgg.framework.tac.elasticsearch.core.page.cache;
+package com.heanbian.block.elasticsearch.client.page;
 
 import java.io.Serializable;
-
-import net.dgg.framework.tac.elasticsearch.core.page.HPaginationIdPair;
 
 public interface HPageCache extends Serializable {
 

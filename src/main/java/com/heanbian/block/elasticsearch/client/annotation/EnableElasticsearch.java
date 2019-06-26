@@ -1,4 +1,4 @@
-package net.dgg.framework.tac.elasticsearch.annotation;
+package com.heanbian.block.elasticsearch.client.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

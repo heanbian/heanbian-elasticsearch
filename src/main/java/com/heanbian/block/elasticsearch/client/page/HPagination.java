@@ -1,4 +1,4 @@
-package net.dgg.framework.tac.elasticsearch.core.page;
+package com.heanbian.block.elasticsearch.client.page;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -17,9 +17,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import net.dgg.framework.tac.elasticsearch.HElasticsearchTemplate;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageCache;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.HMemoryPageCache;
+import com.heanbian.block.elasticsearch.client.HElasticsearchTemplate;
 
 @SuppressWarnings("serial")
 public class HPagination implements Serializable {

@@ -1,4 +1,4 @@
-package net.dgg.framework.tac.elasticsearch.annotation;
+package com.heanbian.block.elasticsearch.client.annotation;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;

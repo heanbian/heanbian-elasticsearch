@@ -1,4 +1,4 @@
-package net.dgg.framework.tac.elasticsearch.core.page.cache;
+package com.heanbian.block.elasticsearch.client.page;
 
 public class HPageGroup {
 	private int inputPageNo;

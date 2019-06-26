@@ -1,5 +1,5 @@
 
-package net.dgg.framework.tac.elasticsearch;
+package com.heanbian.block.elasticsearch.client;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,21 +29,20 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
-
-import net.dgg.framework.tac.elasticsearch.annotation.ElasticsearchId;
-import net.dgg.framework.tac.elasticsearch.core.executor.HExector;
-import net.dgg.framework.tac.elasticsearch.core.executor.HRetryExecutor;
-import net.dgg.framework.tac.elasticsearch.core.operator.HighLevelOperator;
-import net.dgg.framework.tac.elasticsearch.core.operator.HOperator;
-import net.dgg.framework.tac.elasticsearch.core.page.HPageResult;
-import net.dgg.framework.tac.elasticsearch.core.page.HPage;
-import net.dgg.framework.tac.elasticsearch.core.page.HPaginationCondtion;
-import net.dgg.framework.tac.elasticsearch.core.page.HPaginationCondtionEntity;
+import com.heanbian.block.elasticsearch.client.annotation.ElasticsearchId;
+import com.heanbian.block.elasticsearch.client.executor.HExecutor;
+import com.heanbian.block.elasticsearch.client.executor.HRetryExecutor;
+import com.heanbian.block.elasticsearch.client.operator.HOperator;
+import com.heanbian.block.elasticsearch.client.operator.HighLevelOperator;
+import com.heanbian.block.elasticsearch.client.page.HPage;
+import com.heanbian.block.elasticsearch.client.page.HPageResult;
+import com.heanbian.block.elasticsearch.client.page.HPaginationCondtion;
+import com.heanbian.block.elasticsearch.client.page.HPaginationCondtionEntity;
 
 @Component
 public class HElasticsearchTemplate {
 
-	private HExector exector;
+	private HExecutor exector;
 	private CreateIndexOpertor createIndexOpertor;
 	private BulkDocmentOpertor bulkDocumentOpertor;
 	private GetDocumentOpertor documentOpertor;
@@ -59,11 +58,11 @@ public class HElasticsearchTemplate {
 		searchScrollDocumentOpertor = new SearchScrollDocumentOpertor();
 	}
 
-	public HExector getExector() {
+	public HExecutor getExector() {
 		return exector;
 	}
 
-	public void setExector(HExector exector) {
+	public void setExector(HExecutor exector) {
 		this.exector = exector;
 	}
 
