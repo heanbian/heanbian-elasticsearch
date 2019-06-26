@@ -70,7 +70,7 @@ public class HElasticsearchTemplate {
 		return executor.exec(operator, request);
 	}
 
-	public <R, S> S execByHighLevel(HighLevelOperator<R, S> opertor, R request) {
+	public <R, S> S execHighLevel(HighLevelOperator<R, S> opertor, R request) {
 		return executor.exec(opertor, request);
 	}
 
@@ -230,9 +230,9 @@ public class HElasticsearchTemplate {
 		return exec(searchScrollDocumentOperator, request);
 	}
 
-	public <T extends HPage> HPageResult<T> searchByDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
+	public <T extends HPage> HPageResult<T> searchDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
 		for (;;) {
-			HPaginationCondtionEntity entity = condtion.calcPagenationCondtionEntity();
+			HPaginationCondtionEntity entity = condtion.calcPaginationCondtionEntity();
 
 			if (entity.getQueryFromValue() >= condtion.getMaxQueryNum()) {
 				condtion = condtion.nextQueryCondion(entity.getSortOrder());

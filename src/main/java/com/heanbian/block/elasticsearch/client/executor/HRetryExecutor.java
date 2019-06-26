@@ -26,11 +26,9 @@ public class HRetryExecutor implements HExecutor {
 				--count;
 				return operator.operator(operator.getRestClient(), request);
 			}
+			Thread.sleep(1000);
 		} catch (IOException e) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-			}
+		} catch (InterruptedException e) {
 		}
 		throw new RuntimeException("Elasticsearch连接异常");
 	}

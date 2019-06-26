@@ -78,7 +78,7 @@ public class HPaginationCondtion {
 		return c;
 	}
 
-	public HPaginationCondtionEntity calcPagenationCondtionEntity() {
+	public HPaginationCondtionEntity calcPaginationCondtionEntity() {
 		pagination.beforeQuery(inputPageSize, inputBuilder);
 		/* 默认创建首页查询实体 */
 		HPaginationCondtionEntity entity = new HPaginationCondtionEntity(inputPageNo, inputPageSize);

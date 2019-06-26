@@ -81,13 +81,14 @@ public class HPageResult<I extends HPage> {
 					field.setAccessible(true);
 					// Long类型专门处理
 					if (source.get(field.getName()) != null
-							&& "class java.lang.Long".equals(field.getType().toString()))
+							&& "class java.lang.Long".equals(field.getType().toString())) {
 						field.set(model, (Long.parseLong(source.get(field.getName()).toString())));
-					else
+					} else {
 						field.set(model, source.get(field.getName()));
+					}
 				}
 				list.add(model);
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
