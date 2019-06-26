@@ -42,39 +42,39 @@ import com.heanbian.block.elasticsearch.client.page.HPaginationCondtionEntity;
 @Component
 public class HElasticsearchTemplate {
 
-	private HExecutor exector;
-	private CreateIndexOpertor createIndexOpertor;
-	private BulkDocmentOpertor bulkDocumentOpertor;
-	private GetDocumentOpertor documentOpertor;
-	private SearchDocumentOpertor searchDocumentOpertor;
-	private SearchScrollDocumentOpertor searchScrollDocumentOpertor;
+	private HExecutor executor;
+	private CreateIndexOperator createIndexOperator;
+	private BulkDocmentOperator bulkDocumentOperator;
+	private GetDocumentOperator documentOperator;
+	private SearchDocumentOperator searchDocumentOperator;
+	private SearchScrollDocumentOperator searchScrollDocumentOperator;
 
 	public HElasticsearchTemplate() {
-		exector = new HRetryExecutor(10);
-		createIndexOpertor = new CreateIndexOpertor();
-		bulkDocumentOpertor = new BulkDocmentOpertor();
-		documentOpertor = new GetDocumentOpertor();
-		searchDocumentOpertor = new SearchDocumentOpertor();
-		searchScrollDocumentOpertor = new SearchScrollDocumentOpertor();
+		executor = new HRetryExecutor(10);
+		createIndexOperator = new CreateIndexOperator();
+		bulkDocumentOperator = new BulkDocmentOperator();
+		documentOperator = new GetDocumentOperator();
+		searchDocumentOperator = new SearchDocumentOperator();
+		searchScrollDocumentOperator = new SearchScrollDocumentOperator();
 	}
 
-	public HExecutor getExector() {
-		return exector;
+	public HExecutor getExecutor() {
+		return executor;
 	}
 
-	public void setExector(HExecutor exector) {
-		this.exector = exector;
+	public void setExecutor(HExecutor executor) {
+		this.executor = executor;
 	}
 
 	public <E, R, S> S exec(HOperator<E, R, S> operator, R request) {
-		return exector.exec(operator, request);
+		return executor.exec(operator, request);
 	}
 
 	public <R, S> S execByHighLevel(HighLevelOperator<R, S> opertor, R request) {
-		return exector.exec(opertor, request);
+		return executor.exec(opertor, request);
 	}
 
-	public class CreateIndexOpertor extends HighLevelOperator<CreateIndexRequest, CreateIndexResponse> {
+	public class CreateIndexOperator extends HighLevelOperator<CreateIndexRequest, CreateIndexResponse> {
 
 		@Override
 		public CreateIndexResponse operator(RestHighLevelClient client, CreateIndexRequest request) throws IOException {
@@ -82,7 +82,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class BulkDocmentOpertor extends HighLevelOperator<BulkRequest, BulkResponse> {
+	public class BulkDocmentOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
 
 		@Override
 		public BulkResponse operator(RestHighLevelClient client, BulkRequest request) throws IOException {
@@ -90,7 +90,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class GetDocumentOpertor extends HighLevelOperator<GetRequest, GetResponse> {
+	public class GetDocumentOperator extends HighLevelOperator<GetRequest, GetResponse> {
 
 		@Override
 		public GetResponse operator(RestHighLevelClient client, GetRequest request) throws IOException {
@@ -98,7 +98,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class SearchDocumentOpertor extends HighLevelOperator<SearchRequest, SearchResponse> {
+	public class SearchDocumentOperator extends HighLevelOperator<SearchRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchRequest request) throws IOException {
@@ -106,7 +106,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class SearchScrollDocumentOpertor extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
+	public class SearchScrollDocumentOperator extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchScrollRequest request) throws IOException {
@@ -125,7 +125,7 @@ public class HElasticsearchTemplate {
 		if (mapping != null) {
 			request.mapping(mapping);
 		}
-		return exec(createIndexOpertor, request);
+		return exec(createIndexOperator, request);
 	}
 
 	public <T> BulkResponse bulkInsert(String index, T source) {
@@ -145,7 +145,7 @@ public class HElasticsearchTemplate {
 			request.add(new IndexRequest(index).id(getElasticsearchId(d)).source(JSONObject.toJSONString(d),
 					XContentType.JSON));
 		});
-		return exec(bulkDocumentOpertor, request);
+		return exec(bulkDocumentOperator, request);
 	}
 
 	public BulkResponse bulkDelete(String index, String id) {
@@ -163,15 +163,15 @@ public class HElasticsearchTemplate {
 		ids.forEach(d -> {
 			request.add(new DeleteRequest(index, d));
 		});
-		return exec(bulkDocumentOpertor, request);
+		return exec(bulkDocumentOperator, request);
 	}
 
 	public GetResponse findById(String index, String id) {
-		return exec(documentOpertor, new GetRequest(index, id));
+		return exec(documentOperator, new GetRequest(index, id));
 	}
 
 	public <T> T findById(String index, String id, Class<T> clazz) {
-		GetResponse response = exec(documentOpertor, new GetRequest(index, id));
+		GetResponse response = exec(documentOperator, new GetRequest(index, id));
 		return JSONObject.parseObject(response.getSourceAsString(), clazz);
 	}
 
@@ -192,7 +192,7 @@ public class HElasticsearchTemplate {
 			request.add(
 					new UpdateRequest(index, getElasticsearchId(d)).doc(JSONObject.toJSONString(d), XContentType.JSON));
 		});
-		return exec(this.bulkDocumentOpertor, request);
+		return exec(this.bulkDocumentOperator, request);
 	}
 
 	public SearchResponse search(SearchSourceBuilder sourceBuilder, String... indices) {
@@ -215,7 +215,7 @@ public class HElasticsearchTemplate {
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
 		}
-		return exec(searchDocumentOpertor, request);
+		return exec(searchDocumentOperator, request);
 	}
 
 	public SearchResponse searchScroll(String scrollId) {
@@ -227,7 +227,7 @@ public class HElasticsearchTemplate {
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
 		}
-		return exec(searchScrollDocumentOpertor, request);
+		return exec(searchScrollDocumentOperator, request);
 	}
 
 	public <T extends HPage> HPageResult<T> searchByDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
