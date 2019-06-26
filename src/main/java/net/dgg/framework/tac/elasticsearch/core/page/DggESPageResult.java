@@ -65,12 +65,12 @@ public class DggESPageResult<I extends DggIPageModel> {
 	 * @param beanCls
 	 * @param reverse
 	 */
-	public void setList(SearchHit[] hits, Class<I> beanCls, boolean reverse) {
+	public void setList(SearchHit[] hits, Class<I> clazz, boolean reverse) {
 		list = new ArrayList<>(hits.length);
 		for (int i = 0; i < hits.length; i++) {
 			Map<String, Object> source = hits[i].getSourceAsMap();
 			try {
-				I model = beanCls.newInstance();
+				I model = clazz.newInstance();
 				List<Field> fieldList = new ArrayList<>();
 				Class<?> tempClass = model.getClass();
 				while (tempClass != null) {

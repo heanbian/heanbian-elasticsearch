@@ -3,7 +3,6 @@ package net.dgg.framework.tac.elasticsearch.core.executor;
 import java.io.IOException;
 
 import net.dgg.framework.tac.elasticsearch.core.operator.DggIOperator;
-import net.dgg.framework.tac.elasticsearch.exception.ElasticsearchException;
 
 public class DggRetryExecutor implements DggIExector {
 	private boolean monitor;
@@ -33,7 +32,7 @@ public class DggRetryExecutor implements DggIExector {
 	}
 
 	@Override
-	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) throws ElasticsearchException {
+	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) {
 		if (monitor) {
 			execMonitor = new DggExecMonitor();
 			execMonitor.setStartTime(System.currentTimeMillis());
@@ -46,9 +45,9 @@ public class DggRetryExecutor implements DggIExector {
 					Thread.sleep(1000L);
 				}
 			}
-			throw new ElasticsearchException("连接异常");
-		} catch (Exception e) {// 若超时，进行重试操作
-			throw new ElasticsearchException("发现异常：" + e.getMessage(), e);
+			throw new RuntimeException("连接异常");
+		} catch (Exception e) {
+			throw new RuntimeException("发现异常：" + e.getMessage(), e);
 		} finally {
 			if (monitor) {
 				execMonitor.setEndTime(System.currentTimeMillis());

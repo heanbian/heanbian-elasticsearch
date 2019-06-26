@@ -149,7 +149,7 @@ public class DggESPagenation implements Serializable {
 	}
 
 	public <T extends DggIPageModel> SearchHit[] queryHits(ElasticsearchTemplate template,
-			DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception {
+			DggPagenationCondtionEntity entity, Class<T> clazz) {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 		// 添加外部查询条件
@@ -167,7 +167,7 @@ public class DggESPagenation implements Serializable {
 		ssb.query(boolQuery);
 
 		// ES查询
-		SearchResponse response = template.query(ssb, getType(), getIndices());
+		SearchResponse response = template.search(ssb, getIndices());
 
 		// 保存总条数数据
 		if (total == null && lastPageNum == null) {
@@ -193,9 +193,9 @@ public class DggESPagenation implements Serializable {
 	}
 
 	public <T extends DggIPageModel> DggESPageResult<T> query(ElasticsearchTemplate template,
-			DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception {
+			DggPagenationCondtionEntity entity, Class<T> clazz) {
 		DggESPageResult<T> result = new DggESPageResult<>();
-		result.setList(queryHits(template, entity, beanCls), beanCls,
+		result.setList(queryHits(template, entity, clazz), clazz,
 				entity.getSortOrder() == SortOrder.DESC ? false : true);
 		result.setPageNumber(entity.getQueryPageNo());
 		result.setPageSize(entity.getQueryPageSize());
