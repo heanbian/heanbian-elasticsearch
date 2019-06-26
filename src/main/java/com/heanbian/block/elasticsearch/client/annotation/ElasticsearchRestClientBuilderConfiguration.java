@@ -8,17 +8,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@ComponentScan("net.dgg.framework.tac.elasticsearch")
+@ComponentScan("com.heanbian.block.elasticsearch.client")
 @Configuration
 public class ElasticsearchRestClientBuilderConfiguration {
 
-	@Value("${elasticsearch.cluster.nodes:}")
-	private String cluster_nodes;
+	@Value("${elasticsearch.cluster.node:}")
+	private String cluster_node;
 	private HttpHost[] hosts;
 
 	@Bean
 	public RestClientBuilder getRestClientBuilder() {
-		String[] nodes = cluster_nodes.split(",");
+		String[] nodes = cluster_node.split(",");
 		hosts = new HttpHost[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
 			String[] s = nodes[i].split(":");
