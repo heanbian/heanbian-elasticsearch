@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.elasticsearch.search.SearchHit;
 
-public class DggESPageResult<I extends DggIPageModel> {
+public class HPageResult<I extends HPage> {
 
 	/** 当前页号 */
 	private int pageNumber;
@@ -23,7 +23,7 @@ public class DggESPageResult<I extends DggIPageModel> {
 	/** 结果列表 */
 	private List<I> list;
 
-	public DggESPageResult() {
+	public HPageResult() {
 	}
 
 	public int getPageNumber() {

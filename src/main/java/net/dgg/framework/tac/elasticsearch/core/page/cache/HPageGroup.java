@@ -1,11 +1,11 @@
 package net.dgg.framework.tac.elasticsearch.core.page.cache;
 
-public class DggPageNoGroup {
+public class HPageGroup {
 	private int inputPageNo;
 	private int startPageNo;
 	private int endPageNo;
 
-	public DggPageNoGroup(int inputPageNo, int startPageNo, int endPageNo) {
+	public HPageGroup(int inputPageNo, int startPageNo, int endPageNo) {
 		this.inputPageNo = inputPageNo;
 		this.startPageNo = startPageNo;
 		this.endPageNo = endPageNo;

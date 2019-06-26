@@ -1,7 +1,7 @@
 
 package net.dgg.framework.tac.elasticsearch.core.page;
 
-public interface DggIPageModel {
+public interface HPage {
 
 	public Long getId();
 

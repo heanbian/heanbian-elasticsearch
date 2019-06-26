@@ -9,14 +9,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DggESHighLevelClient implements ApplicationContextAware {
+public class HElasticsearchHighLevelClient implements ApplicationContextAware {
 
 	private RestHighLevelClient restHighLevelClient;
 
 	@Autowired
 	private RestClientBuilder restClientBuilder;
 
-	private static DggESHighLevelClient client;
+	private static HElasticsearchHighLevelClient client;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -24,7 +24,7 @@ public class DggESHighLevelClient implements ApplicationContextAware {
 		client = this;
 	}
 
-	public final static DggESHighLevelClient getInstance() {
+	public final static HElasticsearchHighLevelClient getInstance() {
 		return client;
 	}
 

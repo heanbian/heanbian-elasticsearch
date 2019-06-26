@@ -4,7 +4,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-public class DggPagenationCondtionEntity {
+public class HPaginationCondtionEntity {
 	/** 查询页号 */
 	private int queryPageNo;
 
@@ -19,7 +19,7 @@ public class DggPagenationCondtionEntity {
 	/* 查询条件 */
 	private QueryBuilder inputBuilder;
 
-	public DggPagenationCondtionEntity(int inputPageNo, int inputPageSize) {
+	public HPaginationCondtionEntity(int inputPageNo, int inputPageSize) {
 		this.queryPageNo = inputPageNo;
 		this.queryPageSize = inputPageSize;
 		/* 正常情况下都默认用id倒序查询 */

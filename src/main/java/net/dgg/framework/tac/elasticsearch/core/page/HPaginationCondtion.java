@@ -6,16 +6,16 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import net.dgg.framework.tac.elasticsearch.core.page.cache.DggIPageCache;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.DggPageNoGroup;
+import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageCache;
+import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageGroup;
 
-public class DggPagenationCondtion {
+public class HPaginationCondtion {
 	/** 查询输入页码 */
 	private final int inputPageNo;
 	/** 查询输入每页大小 */
 	private final int inputPageSize;
 
-	private DggESPagenation esPagenation;
+	private HPagination esPagenation;
 
 	/* 查询条件 */
 	private QueryBuilder inputBuilder;
@@ -23,14 +23,14 @@ public class DggPagenationCondtion {
 	/* 每次查询最大查询记录数 */
 	private int maxQueryNum = 10000;
 
-	private DggPagenationCondtion preCondtion;
+	private HPaginationCondtion preCondtion;
 
-	DggPagenationCondtion(int inputPageNumber, int inputPageSize) {
+	HPaginationCondtion(int inputPageNumber, int inputPageSize) {
 		this.inputPageNo = inputPageNumber;
 		this.inputPageSize = inputPageSize;
 	}
 
-	public DggPagenationCondtion getPreCondtion() {
+	public HPaginationCondtion getPreCondtion() {
 		return preCondtion;
 	}
 
@@ -42,11 +42,11 @@ public class DggPagenationCondtion {
 		this.maxQueryNum = maxQueryNum;
 	}
 
-	public void setPreCondtion(DggPagenationCondtion preCondtion) {
+	public void setPreCondtion(HPaginationCondtion preCondtion) {
 		this.preCondtion = preCondtion;
 	}
 
-	public DggESPagenation getEsPagenation() {
+	public HPagination getEsPagenation() {
 		return esPagenation;
 	}
 
@@ -58,7 +58,7 @@ public class DggPagenationCondtion {
 		return inputPageSize;
 	}
 
-	void setEsPagenation(DggESPagenation esPagenation) {
+	void setEsPagenation(HPagination esPagenation) {
 		this.esPagenation = esPagenation;
 	}
 
@@ -70,8 +70,8 @@ public class DggPagenationCondtion {
 		this.inputBuilder = inputBuilder;
 	}
 
-	public DggPagenationCondtion nextQueryCondion(SortOrder sortOrder) {
-		DggPagenationCondtion queryCondtion = esPagenation
+	public HPaginationCondtion nextQueryCondion(SortOrder sortOrder) {
+		HPaginationCondtion queryCondtion = esPagenation
 				.createCondtion(sortOrder == SortOrder.DESC ? inputPageNo - maxQueryNum / inputPageSize
 						: inputPageNo + maxQueryNum / inputPageSize, getInputPageSize());
 		queryCondtion.setPreCondtion(this);
@@ -81,22 +81,22 @@ public class DggPagenationCondtion {
 		return queryCondtion;
 	}
 
-	public DggPagenationCondtionEntity calcPagenationCondtionEntity() {
+	public HPaginationCondtionEntity calcPagenationCondtionEntity() {
 		esPagenation.beforeQuery(inputPageSize, inputBuilder);
 		/* 默认创建首页查询实体 */
-		DggPagenationCondtionEntity entity = new DggPagenationCondtionEntity(inputPageNo, inputPageSize);
+		HPaginationCondtionEntity entity = new HPaginationCondtionEntity(inputPageNo, inputPageSize);
 		entity.setInputBuilder(inputBuilder);
 		if (inputPageNo == 1) {
 			return entity;
 		}
-		DggIPageCache pageCache = esPagenation.getPageCache();
+		HPageCache pageCache = esPagenation.getPageCache();
 		/* 非首页查询时需设置条件实体内容 */
 		if (pageCache.isHaveQuery(this.inputPageNo)) {
 			/**
 			 * 如果已经查询过，则直接根据内存中保存的ID进行条件查询
 			 */
-			DggPagenationIdPair pagenationIds = pageCache.getIdPairFromQueryPage(this.inputPageNo);
-			entity.setRangeQueryBuilder(QueryBuilders.rangeQuery(DggESPagenation.ID).gte(pagenationIds.getSmallId())
+			HPaginationIdPair pagenationIds = pageCache.getIdPairFromQueryPage(this.inputPageNo);
+			entity.setRangeQueryBuilder(QueryBuilders.rangeQuery(HPagination.ID).gte(pagenationIds.getSmallId())
 					.lte(pagenationIds.getBigId()));
 			entity.setQueryFromValue(0);
 		} else if (esPagenation.getLastPageNum() != null && inputPageNo == esPagenation.getLastPageNum()) {
@@ -107,10 +107,10 @@ public class DggPagenationCondtion {
 			entity.setQueryFromValue(0);
 			entity.setSortOrder(SortOrder.ASC);
 		} else {
-			DggPageNoGroup pageNoPair = pageCache.getClosestFromTarget(this.inputPageNo);
+			HPageGroup pageNoPair = pageCache.getClosestFromTarget(this.inputPageNo);
 			if (!pageCache.isFirstQuery()) {
 				// 这种情况为不是第一次查询，第一次查询不需要id条件
-				RangeQueryBuilder builder = QueryBuilders.rangeQuery(DggESPagenation.ID);
+				RangeQueryBuilder builder = QueryBuilders.rangeQuery(HPagination.ID);
 				builder = pageCache.isHaveQuery(pageNoPair.getEndPageNo())
 						? builder.gt(pageCache.getIdPairFromQueryPage(pageNoPair.getEndPageNo()).getBigId())
 						: builder;

@@ -3,12 +3,12 @@ package net.dgg.framework.tac.elasticsearch.core.page;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class DggPagenationIdPair implements Serializable {
+public class HPaginationIdPair implements Serializable {
 
 	private long smallId;
 	private long bigId;
 
-	public DggPagenationIdPair(long smallId, long bigId) {
+	public HPaginationIdPair(long smallId, long bigId) {
 		this.smallId = smallId;
 		this.bigId = bigId;
 	}

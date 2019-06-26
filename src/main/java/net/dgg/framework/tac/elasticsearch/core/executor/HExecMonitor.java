@@ -1,6 +1,6 @@
 package net.dgg.framework.tac.elasticsearch.core.executor;
 
-public class DggExecMonitor {
+public class HExecMonitor {
 	private long startTime;
 	private long endTime;
 

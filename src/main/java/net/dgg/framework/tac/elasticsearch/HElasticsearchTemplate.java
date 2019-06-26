@@ -31,27 +31,27 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 
 import net.dgg.framework.tac.elasticsearch.annotation.ElasticsearchId;
-import net.dgg.framework.tac.elasticsearch.core.executor.DggIExector;
-import net.dgg.framework.tac.elasticsearch.core.executor.DggRetryExecutor;
-import net.dgg.framework.tac.elasticsearch.core.operator.DggESHighLevelOpertor;
-import net.dgg.framework.tac.elasticsearch.core.operator.DggIOperator;
-import net.dgg.framework.tac.elasticsearch.core.page.DggESPageResult;
-import net.dgg.framework.tac.elasticsearch.core.page.DggIPageModel;
-import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationCondtion;
-import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationCondtionEntity;
+import net.dgg.framework.tac.elasticsearch.core.executor.HExector;
+import net.dgg.framework.tac.elasticsearch.core.executor.HRetryExecutor;
+import net.dgg.framework.tac.elasticsearch.core.operator.HighLevelOperator;
+import net.dgg.framework.tac.elasticsearch.core.operator.HOperator;
+import net.dgg.framework.tac.elasticsearch.core.page.HPageResult;
+import net.dgg.framework.tac.elasticsearch.core.page.HPage;
+import net.dgg.framework.tac.elasticsearch.core.page.HPaginationCondtion;
+import net.dgg.framework.tac.elasticsearch.core.page.HPaginationCondtionEntity;
 
 @Component
-public class ElasticsearchTemplate {
+public class HElasticsearchTemplate {
 
-	private DggIExector exector;
+	private HExector exector;
 	private CreateIndexOpertor createIndexOpertor;
 	private BulkDocmentOpertor bulkDocumentOpertor;
 	private GetDocumentOpertor documentOpertor;
 	private SearchDocumentOpertor searchDocumentOpertor;
 	private SearchScrollDocumentOpertor searchScrollDocumentOpertor;
 
-	public ElasticsearchTemplate() {
-		exector = new DggRetryExecutor(10);
+	public HElasticsearchTemplate() {
+		exector = new HRetryExecutor(10);
 		createIndexOpertor = new CreateIndexOpertor();
 		bulkDocumentOpertor = new BulkDocmentOpertor();
 		documentOpertor = new GetDocumentOpertor();
@@ -59,23 +59,23 @@ public class ElasticsearchTemplate {
 		searchScrollDocumentOpertor = new SearchScrollDocumentOpertor();
 	}
 
-	public DggIExector getExector() {
+	public HExector getExector() {
 		return exector;
 	}
 
-	public void setExector(DggIExector exector) {
+	public void setExector(HExector exector) {
 		this.exector = exector;
 	}
 
-	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) {
+	public <E, R, S> S exec(HOperator<E, R, S> operator, R request) {
 		return exector.exec(operator, request);
 	}
 
-	public <R, S> S execByHighLevel(DggESHighLevelOpertor<R, S> opertor, R request) {
+	public <R, S> S execByHighLevel(HighLevelOperator<R, S> opertor, R request) {
 		return exector.exec(opertor, request);
 	}
 
-	public class CreateIndexOpertor extends DggESHighLevelOpertor<CreateIndexRequest, CreateIndexResponse> {
+	public class CreateIndexOpertor extends HighLevelOperator<CreateIndexRequest, CreateIndexResponse> {
 
 		@Override
 		public CreateIndexResponse operator(RestHighLevelClient client, CreateIndexRequest request) throws IOException {
@@ -83,7 +83,7 @@ public class ElasticsearchTemplate {
 		}
 	}
 
-	public class BulkDocmentOpertor extends DggESHighLevelOpertor<BulkRequest, BulkResponse> {
+	public class BulkDocmentOpertor extends HighLevelOperator<BulkRequest, BulkResponse> {
 
 		@Override
 		public BulkResponse operator(RestHighLevelClient client, BulkRequest request) throws IOException {
@@ -91,7 +91,7 @@ public class ElasticsearchTemplate {
 		}
 	}
 
-	public class GetDocumentOpertor extends DggESHighLevelOpertor<GetRequest, GetResponse> {
+	public class GetDocumentOpertor extends HighLevelOperator<GetRequest, GetResponse> {
 
 		@Override
 		public GetResponse operator(RestHighLevelClient client, GetRequest request) throws IOException {
@@ -99,7 +99,7 @@ public class ElasticsearchTemplate {
 		}
 	}
 
-	public class SearchDocumentOpertor extends DggESHighLevelOpertor<SearchRequest, SearchResponse> {
+	public class SearchDocumentOpertor extends HighLevelOperator<SearchRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchRequest request) throws IOException {
@@ -107,7 +107,7 @@ public class ElasticsearchTemplate {
 		}
 	}
 
-	public class SearchScrollDocumentOpertor extends DggESHighLevelOpertor<SearchScrollRequest, SearchResponse> {
+	public class SearchScrollDocumentOpertor extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchScrollRequest request) throws IOException {
@@ -230,11 +230,11 @@ public class ElasticsearchTemplate {
 		return exec(searchScrollDocumentOpertor, request);
 	}
 
-	public <T extends DggIPageModel> DggESPageResult<T> searchByDeeppaging(DggPagenationCondtion condtion,
+	public <T extends HPage> HPageResult<T> searchByDeeppaging(HPaginationCondtion condtion,
 			Class<T> clazz) {
-		DggPagenationCondtion queryCondtion = condtion;
+		HPaginationCondtion queryCondtion = condtion;
 		for (;;) {
-			DggPagenationCondtionEntity entity = queryCondtion.calcPagenationCondtionEntity();
+			HPaginationCondtionEntity entity = queryCondtion.calcPagenationCondtionEntity();
 
 			if (entity.getQueryFromValue() >= queryCondtion.getMaxQueryNum()) {
 				queryCondtion = queryCondtion.nextQueryCondion(entity.getSortOrder());

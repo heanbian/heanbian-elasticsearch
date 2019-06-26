@@ -17,12 +17,12 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import net.dgg.framework.tac.elasticsearch.ElasticsearchTemplate;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.DggIPageCache;
-import net.dgg.framework.tac.elasticsearch.core.page.cache.DggLocalMemoryPageCache;
+import net.dgg.framework.tac.elasticsearch.HElasticsearchTemplate;
+import net.dgg.framework.tac.elasticsearch.core.page.cache.HPageCache;
+import net.dgg.framework.tac.elasticsearch.core.page.cache.HMemoryPageCache;
 
 @SuppressWarnings("serial")
-public class DggESPagenation implements Serializable {
+public class HPagination implements Serializable {
 
 	/** 需要搜索的索引名数组 */
 	private String[] indices;
@@ -41,7 +41,7 @@ public class DggESPagenation implements Serializable {
 	/** 查询总数 */
 	private Long total;
 
-	private DggIPageCache pageCache;
+	private HPageCache pageCache;
 
 	/**
 	 * 通过此次判断本对象条件是否被修改
@@ -61,19 +61,19 @@ public class DggESPagenation implements Serializable {
 		this.pageNum = pageNum;
 	}
 
-	public DggESPagenation() {
-		this.pageCache = new DggLocalMemoryPageCache();
+	public HPagination() {
+		this.pageCache = new HMemoryPageCache();
 	}
 
-	public DggESPagenation(DggIPageCache pageCache) {
+	public HPagination(HPageCache pageCache) {
 		this.pageCache = pageCache;
 	}
 
-	public DggIPageCache getPageCache() {
+	public HPageCache getPageCache() {
 		return pageCache;
 	}
 
-	public void setPageCache(DggIPageCache pageCache) {
+	public void setPageCache(HPageCache pageCache) {
 		this.pageCache = pageCache;
 	}
 
@@ -135,21 +135,21 @@ public class DggESPagenation implements Serializable {
 		this.total = total;
 	}
 
-	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize) {
-		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber, inputPageSize);
+	public HPaginationCondtion createCondtion(int inputPageNumber, int inputPageSize) {
+		HPaginationCondtion currCondition = new HPaginationCondtion(inputPageNumber, inputPageSize);
 		currCondition.setEsPagenation(this);
 		return currCondition;
 	}
 
-	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize, QueryBuilder inputBuilder) {
-		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber, inputPageSize);
+	public HPaginationCondtion createCondtion(int inputPageNumber, int inputPageSize, QueryBuilder inputBuilder) {
+		HPaginationCondtion currCondition = new HPaginationCondtion(inputPageNumber, inputPageSize);
 		currCondition.setEsPagenation(this);
 		currCondition.setInputBuilder(inputBuilder);
 		return currCondition;
 	}
 
-	public <T extends DggIPageModel> SearchHit[] queryHits(ElasticsearchTemplate template,
-			DggPagenationCondtionEntity entity, Class<T> clazz) {
+	public <T extends HPage> SearchHit[] queryHits(HElasticsearchTemplate template,
+			HPaginationCondtionEntity entity, Class<T> clazz) {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 		// 添加外部查询条件
@@ -180,11 +180,11 @@ public class DggESPagenation implements Serializable {
 		if (hits.length > 0 && !pageCache.isHaveQuery(entity.getQueryPageNo())) {
 			if (entity.getSortOrder() == SortOrder.DESC) {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new DggPagenationIdPair((Long) hits[hits.length - 1].getSourceAsMap().get(ID),
+						new HPaginationIdPair((Long) hits[hits.length - 1].getSourceAsMap().get(ID),
 								(Long) hits[0].getSourceAsMap().get(ID)));
 			} else {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new DggPagenationIdPair((Long) hits[0].getSourceAsMap().get(ID),
+						new HPaginationIdPair((Long) hits[0].getSourceAsMap().get(ID),
 								(Long) hits[hits.length - 1].getSourceAsMap().get(ID)));
 			}
 		}
@@ -192,9 +192,9 @@ public class DggESPagenation implements Serializable {
 		return hits;
 	}
 
-	public <T extends DggIPageModel> DggESPageResult<T> query(ElasticsearchTemplate template,
-			DggPagenationCondtionEntity entity, Class<T> clazz) {
-		DggESPageResult<T> result = new DggESPageResult<>();
+	public <T extends HPage> HPageResult<T> query(HElasticsearchTemplate template,
+			HPaginationCondtionEntity entity, Class<T> clazz) {
+		HPageResult<T> result = new HPageResult<>();
 		result.setList(queryHits(template, entity, clazz), clazz,
 				entity.getSortOrder() == SortOrder.DESC ? false : true);
 		result.setPageNumber(entity.getQueryPageNo());
@@ -239,14 +239,14 @@ public class DggESPagenation implements Serializable {
 		}
 	}
 
-	public static String toString(DggESPagenation pagenation) {
+	public static String toString(HPagination pagenation) {
 		return pagenation.asString();
 	}
 
-	public static DggESPagenation toESPagenation(String pagenationString) {
+	public static HPagination toESPagenation(String pagenationString) {
 		try (ObjectInputStream in = new ObjectInputStream(
 				new BufferedInputStream(new ByteArrayInputStream(toByteArray(pagenationString))))) {
-			return (DggESPagenation) in.readObject();
+			return (HPagination) in.readObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

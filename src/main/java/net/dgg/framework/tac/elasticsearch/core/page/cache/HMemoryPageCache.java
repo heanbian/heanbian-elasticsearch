@@ -6,26 +6,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationIdPair;
+import net.dgg.framework.tac.elasticsearch.core.page.HPaginationIdPair;
 
 @SuppressWarnings("serial")
-public class DggLocalMemoryPageCache implements DggIPageCache {
+public class HMemoryPageCache implements HPageCache {
 
 	/** key:第n个10条，value:起始id对象 */
-	private Map<Integer, DggPagenationIdPair> idMaps = new HashMap<>();
+	private Map<Integer, HPaginationIdPair> idMaps = new HashMap<>();
 
 	/** 上述map里的顺序n列表 */
 	private List<Integer> pageNoLists = new ArrayList<Integer>();
 
 	@Override
-	public void saveQueryPage(int pageNo, DggPagenationIdPair idPair) {
+	public void saveQueryPage(int pageNo, HPaginationIdPair idPair) {
 		if (!idMaps.containsKey(pageNo)) {
 			idMaps.put(pageNo, idPair);
 		}
 	}
 
 	@Override
-	public DggPagenationIdPair getIdPairFromQueryPage(int pageNo) {
+	public HPaginationIdPair getIdPairFromQueryPage(int pageNo) {
 		return idMaps.get(pageNo);
 	}
 
@@ -36,7 +36,7 @@ public class DggLocalMemoryPageCache implements DggIPageCache {
 
 	/* 没有查询过，则查看前后两端离条件最近的已查询过的条件，要能查到，则需将当前开始页数与结束页数添加到List，然后通过List排序定位离目标最近 */
 	@Override
-	public DggPageNoGroup getClosestFromTarget(int pageNo) {
+	public HPageGroup getClosestFromTarget(int pageNo) {
 
 		/* 每次判断需重新得到当前实际查询的页码号列表 */
 		pageNoLists = new ArrayList<>(idMaps.keySet());
@@ -64,7 +64,7 @@ public class DggLocalMemoryPageCache implements DggIPageCache {
 			pageNumEnd = pageNo;
 		}
 
-		return new DggPageNoGroup(pageNo, pageNumStart, pageNumEnd);
+		return new HPageGroup(pageNo, pageNumStart, pageNumEnd);
 	}
 
 	@Override

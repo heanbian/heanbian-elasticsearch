@@ -2,14 +2,14 @@ package net.dgg.framework.tac.elasticsearch.core.executor;
 
 import java.io.IOException;
 
-import net.dgg.framework.tac.elasticsearch.core.operator.DggIOperator;
+import net.dgg.framework.tac.elasticsearch.core.operator.HOperator;
 
-public class DggRetryExecutor implements DggIExector {
+public class HRetryExecutor implements HExector {
 	private boolean monitor;
-	private DggExecMonitor execMonitor;
+	private HExecMonitor execMonitor;
 	private int retryNum;
 
-	public DggRetryExecutor(int retryNum) {
+	public HRetryExecutor(int retryNum) {
 		this.retryNum = retryNum;
 	}
 
@@ -32,9 +32,9 @@ public class DggRetryExecutor implements DggIExector {
 	}
 
 	@Override
-	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) {
+	public <E, R, S> S exec(HOperator<E, R, S> operator, R request) {
 		if (monitor) {
-			execMonitor = new DggExecMonitor();
+			execMonitor = new HExecMonitor();
 			execMonitor.setStartTime(System.currentTimeMillis());
 		}
 		try {

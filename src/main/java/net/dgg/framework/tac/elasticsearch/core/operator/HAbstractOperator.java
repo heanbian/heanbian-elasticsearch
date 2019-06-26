@@ -3,7 +3,7 @@ package net.dgg.framework.tac.elasticsearch.core.operator;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 
-public abstract class DggAbstractOpertor<E, R, S> implements DggIOperator<E, R, S> {
+public abstract class HAbstractOperator<E, R, S> implements HOperator<E, R, S> {
 
 	private RequestOptions requestOptions = RequestOptions.DEFAULT;
 	private RestClientBuilder restClientBuilder;
@@ -21,7 +21,7 @@ public abstract class DggAbstractOpertor<E, R, S> implements DggIOperator<E, R, 
 	@Override
 	public RestClientBuilder getBuilder() {
 		if (restClientBuilder == null) {
-			restClientBuilder = DggESHighLevelClient.getInstance().getRestClientBuilder();
+			restClientBuilder = HElasticsearchHighLevelClient.getInstance().getRestClientBuilder();
 		}
 		return restClientBuilder;
 	}

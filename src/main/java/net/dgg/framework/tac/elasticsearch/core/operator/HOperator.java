@@ -3,7 +3,7 @@ package net.dgg.framework.tac.elasticsearch.core.operator;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 
-public interface DggIOperator<E, R, S> {
+public interface HOperator<E, R, S> {
 
 	public E getRestClient();
 
