@@ -14,8 +14,6 @@ import org.elasticsearch.search.sort.SortOrder;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggIPageCache;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggPageNoGroup;
 
-import java.util.Arrays;
-
 /**
  * 〈一句话功能简述〉<br> 
  * 〈页码条件内〉

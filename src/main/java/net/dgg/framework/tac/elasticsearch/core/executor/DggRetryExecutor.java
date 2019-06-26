@@ -6,13 +6,10 @@
  */
 package net.dgg.framework.tac.elasticsearch.core.executor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 import net.dgg.framework.tac.elasticsearch.core.operator.DggIOperator;
 import net.dgg.framework.tac.elasticsearch.exception.DggEsException;
-
-import java.io.IOException;
 
 /**
  * 〈一句话功能简述〉<br> 
@@ -22,7 +19,6 @@ import java.io.IOException;
  * @create 2018/12/14
  */
 public class DggRetryExecutor implements DggIExector{
-    private final static Logger logger = LoggerFactory.getLogger(DggRetryExecutor.class);
     private boolean monitor;
     private DggExecMonitor execMonitor;
     private int retryNum;
@@ -51,7 +47,7 @@ public class DggRetryExecutor implements DggIExector{
 
     @Override
     public <E,R,S> S exec(DggIOperator<E,R,S> operator,R request) throws DggEsException {
-        if(logger.isDebugEnabled() && monitor) {
+        if(monitor) {
             execMonitor = new DggExecMonitor();
             execMonitor.setStartTime(System.currentTimeMillis());
         }
@@ -64,12 +60,11 @@ public class DggRetryExecutor implements DggIExector{
                 }
             }
             throw new DggEsException("连接异常");
-        }catch(Exception ioe) {//若超时，进行重试操作
-            throw new DggEsException("发现异常：" + ioe.getMessage(), ioe);
+        }catch(Exception e) {//若超时，进行重试操作
+            throw new DggEsException("发现异常：" + e.getMessage(), e);
         }finally {
-            if(logger.isDebugEnabled() && monitor) {
+            if(monitor) {
                 execMonitor.setEndTime(System.currentTimeMillis());
-                logger.debug("本次耗时：" + execMonitor.getSpendTime() + "毫秒");
             }
         }
     }

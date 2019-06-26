@@ -1,21 +1,25 @@
 package net.dgg.framework.tac.elasticsearch.core.page;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.util.Arrays;
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import net.dgg.framework.tac.elasticsearch.DggESTemplate;
+import net.dgg.framework.tac.elasticsearch.ElasticsearchTemplate;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggIPageCache;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggLocalMemoryPageCache;
-
-import java.io.*;
-import java.security.MessageDigest;
-import java.util.Arrays;
 
 /**
  * @Author: tumq
@@ -31,7 +35,7 @@ public class DggESPagenation implements Serializable {
 	private static final long serialVersionUID = 9022412092254850478L;
 
 	/** 需要搜索的索引名数组 */
-	private String [] indices;
+	private String[] indices;
 
 	/** 需要搜索的type */
 	private String type;
@@ -67,11 +71,11 @@ public class DggESPagenation implements Serializable {
 		this.pageNum = pageNum;
 	}
 
-	public DggESPagenation(){
+	public DggESPagenation() {
 		this.pageCache = new DggLocalMemoryPageCache();
 	}
 
-	public DggESPagenation(DggIPageCache pageCache){
+	public DggESPagenation(DggIPageCache pageCache) {
 		this.pageCache = pageCache;
 	}
 
@@ -109,13 +113,13 @@ public class DggESPagenation implements Serializable {
 		return hexValue.toString();
 	}
 
-	void beforeQuery(int inputPageSize,QueryBuilder inputBuilder){
-		String md5str = md5Encode(Arrays.toString(indices)+type+sortFild+inputPageSize+inputBuilder.toString());
-		if(uniqueString == null){
+	void beforeQuery(int inputPageSize, QueryBuilder inputBuilder) {
+		String md5str = md5Encode(Arrays.toString(indices) + type + sortFild + inputPageSize + inputBuilder.toString());
+		if (uniqueString == null) {
 			uniqueString = md5str;
-		}else{
-			if(!uniqueString.equals(md5str)){
-				//本对象条件已被改变，清除缓存，重新利用本对象进行查询，同时赋值最新的串
+		} else {
+			if (!uniqueString.equals(md5str)) {
+				// 本对象条件已被改变，清除缓存，重新利用本对象进行查询，同时赋值最新的串
 				pageCache.clear();
 				total = null;
 				lastPageNum = null;
@@ -141,70 +145,68 @@ public class DggESPagenation implements Serializable {
 		this.total = total;
 	}
 
-	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize){
-		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber,inputPageSize);
+	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize) {
+		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber, inputPageSize);
 		currCondition.setEsPagenation(this);
 		return currCondition;
 	}
 
-	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize, QueryBuilder inputBuilder){
-		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber,inputPageSize);
+	public DggPagenationCondtion createCondtion(int inputPageNumber, int inputPageSize, QueryBuilder inputBuilder) {
+		DggPagenationCondtion currCondition = new DggPagenationCondtion(inputPageNumber, inputPageSize);
 		currCondition.setEsPagenation(this);
 		currCondition.setInputBuilder(inputBuilder);
 		return currCondition;
 	}
 
-	public <T extends DggIPageModel> SearchHit[] queryHits(DggESTemplate template, DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception{
+	public <T extends DggIPageModel> SearchHit[] queryHits(ElasticsearchTemplate template, DggPagenationCondtionEntity entity,
+			Class<T> beanCls) throws Exception {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-		//添加外部查询条件
-		boolQuery = entity.getInputBuilder() != null?boolQuery.filter(entity.getInputBuilder()):boolQuery;
-		//添加内部生成条件
-		if(entity.getRangeQueryBuilder() != null) {
+		// 添加外部查询条件
+		boolQuery = entity.getInputBuilder() != null ? boolQuery.filter(entity.getInputBuilder()) : boolQuery;
+		// 添加内部生成条件
+		if (entity.getRangeQueryBuilder() != null) {
 			boolQuery.must(entity.getRangeQueryBuilder());
 		}
 
 		ssb.from(entity.getQueryFromValue()).size(entity.getQueryPageSize());
 		ssb.sort(ID, entity.getSortOrder());
-		if(getSortFild() != null) {
+		if (getSortFild() != null) {
 			ssb.sort(getSortFild(), entity.getSortOrder());
 		}
 		ssb.query(boolQuery);
 
-		//ES查询
-		SearchResponse response = template.query(ssb,getType(),getIndices());
+		// ES查询
+		SearchResponse response = template.query(ssb, getType(), getIndices());
 
-		//保存总条数数据
-		if(total == null && lastPageNum == null){
-			total = response.getHits().totalHits;
-			lastPageNum = total%entity.getQueryPageSize() > 0?total/entity.getQueryPageSize()+1:total/entity.getQueryPageSize();
+		// 保存总条数数据
+		if (total == null && lastPageNum == null) {
+			total = response.getHits().getTotalHits().value;
+			lastPageNum = total % entity.getQueryPageSize() > 0 ? total / entity.getQueryPageSize() + 1
+					: total / entity.getQueryPageSize();
 		}
 		SearchHit[] hits = response.getHits().getHits();
-		//保存查询出的记录首尾ID
-		if(hits.length > 0 && !pageCache.isHaveQuery(entity.getQueryPageNo())) {
+		// 保存查询出的记录首尾ID
+		if (hits.length > 0 && !pageCache.isHaveQuery(entity.getQueryPageNo())) {
 			if (entity.getSortOrder() == SortOrder.DESC) {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new DggPagenationIdPair(
-							(Long) hits[hits.length - 1].getSourceAsMap().get(ID),
-							(Long) hits[0].getSourceAsMap().get(ID)
-						)
-				);
+						new DggPagenationIdPair((Long) hits[hits.length - 1].getSourceAsMap().get(ID),
+								(Long) hits[0].getSourceAsMap().get(ID)));
 			} else {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new DggPagenationIdPair(
-							(Long) hits[0].getSourceAsMap().get(ID),
-							(Long) hits[hits.length - 1].getSourceAsMap().get(ID)
-						)
-				);
+						new DggPagenationIdPair((Long) hits[0].getSourceAsMap().get(ID),
+								(Long) hits[hits.length - 1].getSourceAsMap().get(ID)));
 			}
 		}
 
 		return hits;
 	}
 
-	public <T extends DggIPageModel> DggESPageResult<T> query(DggESTemplate template, DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception{
-		DggESPageResult<T> result = new DggESPageResult();
-		result.setList(queryHits(template,entity,beanCls),beanCls,entity.getSortOrder()==SortOrder.DESC?false:true);
+	public <T extends DggIPageModel> DggESPageResult<T> query(ElasticsearchTemplate template,
+			DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception {
+		DggESPageResult<T> result = new DggESPageResult<>();
+		result.setList(queryHits(template, entity, beanCls), beanCls,
+				entity.getSortOrder() == SortOrder.DESC ? false : true);
 		result.setPageNumber(entity.getQueryPageNo());
 		result.setPageSize(entity.getQueryPageSize());
 		result.setTotal(total);
@@ -236,25 +238,26 @@ public class DggESPagenation implements Serializable {
 		this.sortFild = sortFild;
 	}
 
-	public String asString(){
-		try(ByteArrayOutputStream bout = new ByteArrayOutputStream();
-			ObjectOutputStream out = new ObjectOutputStream(bout)){
+	public String asString() {
+		try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+				ObjectOutputStream out = new ObjectOutputStream(bout)) {
 			out.writeObject(this);
 			return toHexString(bout.toByteArray());
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static String toString(DggESPagenation pagenation){
+	public static String toString(DggESPagenation pagenation) {
 		return pagenation.asString();
 	}
 
-	public static DggESPagenation toESPagenation(String pagenationString){
-		try(ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(toByteArray(pagenationString))))) {
-			return (DggESPagenation)in.readObject();
-		}catch(Exception e){
+	public static DggESPagenation toESPagenation(String pagenationString) {
+		try (ObjectInputStream in = new ObjectInputStream(
+				new BufferedInputStream(new ByteArrayInputStream(toByteArray(pagenationString))))) {
+			return (DggESPagenation) in.readObject();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -266,7 +269,7 @@ public class DggESPagenation implements Serializable {
 		}
 		final byte[] byteArray = new byte[hexString.length() / 2];
 		int k = 0;
-		for (int i = 0; i < byteArray.length; i++) {//因为是16进制，最多只会占用4位，转换成字节需要两个16进制的字符，高位在先
+		for (int i = 0; i < byteArray.length; i++) {// 因为是16进制，最多只会占用4位，转换成字节需要两个16进制的字符，高位在先
 			byte high = (byte) (Character.digit(hexString.charAt(k), 16) & 0xff);
 			byte low = (byte) (Character.digit(hexString.charAt(k + 1), 16) & 0xff);
 			byteArray[i] = (byte) (high << 4 | low);
@@ -276,23 +279,23 @@ public class DggESPagenation implements Serializable {
 	}
 
 	/**
-	* 字节数组转成16进制表示格式的字符串
-	*
-	* @param byteArray 需要转换的字节数组
-	* @return 16进制表示格式的字符串
-	**/
+	 * 字节数组转成16进制表示格式的字符串
+	 *
+	 * @param byteArray 需要转换的字节数组
+	 * @return 16进制表示格式的字符串
+	 **/
 	public static String toHexString(byte[] byteArray) {
 		if (byteArray == null || byteArray.length < 1) {
 			throw new IllegalArgumentException("this byteArray must not be null or empty");
 		}
 
-			final StringBuilder hexString = new StringBuilder();
-			for (int i = 0; i < byteArray.length; i++) {
-				if ((byteArray[i] & 0xff) < 0x10) {//0~F前面不零
-					hexString.append("0");
-				}
-				hexString.append(Integer.toHexString(0xFF & byteArray[i]));
+		final StringBuilder hexString = new StringBuilder();
+		for (int i = 0; i < byteArray.length; i++) {
+			if ((byteArray[i] & 0xff) < 0x10) {// 0~F前面不零
+				hexString.append("0");
 			}
-			return hexString.toString();
+			hexString.append(Integer.toHexString(0xFF & byteArray[i]));
+		}
+		return hexString.toString();
 	}
 }

@@ -15,6 +15,7 @@ import java.io.Serializable;
  * @author tumq
  * @create 2018/12/19
  */
+@SuppressWarnings("serial")
 public class DggPagenationIdPair implements Serializable {
 
     private long smallId;

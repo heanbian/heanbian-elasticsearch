@@ -8,8 +8,6 @@ package net.dgg.framework.tac.elasticsearch.core.operator;
 
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 〈一句话功能简述〉<br> 

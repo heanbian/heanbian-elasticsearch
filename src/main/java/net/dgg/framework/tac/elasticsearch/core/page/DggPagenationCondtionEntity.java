@@ -32,8 +32,6 @@ public class DggPagenationCondtionEntity {
     /*查询条件*/
     private QueryBuilder inputBuilder;
 
-    private boolean isEnable = true;
-
     public DggPagenationCondtionEntity(int inputPageNo, int inputPageSize) {
         this.queryPageNo = inputPageNo;
         this.queryPageSize = inputPageSize;
