@@ -2,6 +2,8 @@
 package net.dgg.framework.tac.elasticsearch;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Component;
 
@@ -140,9 +143,8 @@ public class ElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			ElasticsearchId id = d.getClass().getAnnotation(ElasticsearchId.class);
-			request.add(
-					new IndexRequest(index).id(id.toString()).source(JSONObject.toJSONString(d), XContentType.JSON));
+			request.add(new IndexRequest(index).id(getElasticsearchId(d)).source(JSONObject.toJSONString(d),
+					XContentType.JSON));
 		});
 		return exec(bulkDocumentOpertor, request);
 	}
@@ -188,8 +190,7 @@ public class ElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			ElasticsearchId id = d.getClass().getAnnotation(ElasticsearchId.class);
-			request.add(new UpdateRequest(index, id.toString()).doc(JSONObject.toJSONString(d), XContentType.JSON));
+			request.add(new UpdateRequest(index, getElasticsearchId(d)).doc(JSONObject.toJSONString(d), XContentType.JSON));
 		});
 		return exec(this.bulkDocumentOpertor, request);
 	}
@@ -197,8 +198,18 @@ public class ElasticsearchTemplate {
 	public SearchResponse search(SearchSourceBuilder sourceBuilder, String... indices) {
 		return search(sourceBuilder, null, indices);
 	}
+	
+	public <T> List<T> search(SearchSourceBuilder sourceBuilder, String[] indices, Class<T> clazz) {
+		SearchResponse response = search(sourceBuilder, null, indices);
+		List<T> res = new ArrayList<>();
+		SearchHit[] hits = response.getHits().getHits();
+		for (SearchHit h : hits) {
+			res.add(JSONObject.parseObject(h.getSourceAsString(), clazz));
+		}
+		return res;
+	}
 
-	public SearchResponse search(SearchSourceBuilder sourceBuilder, String keepAlive, String... indices) {
+	public SearchResponse search(SearchSourceBuilder sourceBuilder, String keepAlive, String[] indices) {
 		SearchRequest request = new SearchRequest(indices);
 		request.source(sourceBuilder);
 		if (keepAlive != null) {
@@ -238,4 +249,20 @@ public class ElasticsearchTemplate {
 			return queryCondtion.getEsPagenation().query(this, entity, clazz);
 		}
 	}
+
+	private <T> String getElasticsearchId(T source) {
+		try {
+			for (Field f : source.getClass().getDeclaredFields()) {
+				if (f.isAnnotationPresent(ElasticsearchId.class)) {
+					f.setAccessible(true);
+					if (f.get(source) != null) {
+						return f.get(source).toString();
+					}
+				}
+			}
+		} catch (Exception e) {
+		}
+		throw new RuntimeException("No \"@ElasticsearchId\" field found");
+	}
+
 }
