@@ -1,9 +1,3 @@
-/**
- * FileName: LocalMemoryPageCache
- * Author:   tumq
- * Date:     2018/12/19 15:41
- * Description: 通过本地内存作为深度分页缓存
- */
 package net.dgg.framework.tac.elasticsearch.core.page.cache;
 
 import java.util.ArrayList;
@@ -14,13 +8,6 @@ import java.util.Map;
 
 import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationIdPair;
 
-/**
- * 〈一句话功能简述〉<br>
- * 〈通过本地内存作为深度分页缓存〉
- *
- * @author tumq
- * @create 2018/12/19
- */
 @SuppressWarnings("serial")
 public class DggLocalMemoryPageCache implements DggIPageCache {
 

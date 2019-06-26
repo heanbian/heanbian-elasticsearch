@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 
-import net.dgg.framework.tac.elasticsearch.annotation.DggEsIdentify;
+import net.dgg.framework.tac.elasticsearch.annotation.ElasticsearchId;
 import net.dgg.framework.tac.elasticsearch.core.executor.DggIExector;
 import net.dgg.framework.tac.elasticsearch.core.executor.DggRetryExecutor;
 import net.dgg.framework.tac.elasticsearch.core.operator.DggESHighLevelOpertor;
@@ -46,7 +46,7 @@ import net.dgg.framework.tac.elasticsearch.core.page.DggESPageResult;
 import net.dgg.framework.tac.elasticsearch.core.page.DggIPageModel;
 import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationCondtion;
 import net.dgg.framework.tac.elasticsearch.core.page.DggPagenationCondtionEntity;
-import net.dgg.framework.tac.elasticsearch.exception.DggEsException;
+import net.dgg.framework.tac.elasticsearch.exception.ElasticsearchException;
 
 @Component
 public class ElasticsearchTemplate {
@@ -83,11 +83,11 @@ public class ElasticsearchTemplate {
 		this.exector = exector;
 	}
 
-	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) throws DggEsException {
+	public <E, R, S> S exec(DggIOperator<E, R, S> operator, R request) throws ElasticsearchException {
 		return exector.exec(operator, request);
 	}
 
-	public <R, S> S execByHighLevel(DggESHighLevelOpertor<R, S> opertor, R request) throws DggEsException {
+	public <R, S> S execByHighLevel(DggESHighLevelOpertor<R, S> opertor, R request) throws ElasticsearchException {
 		return exector.exec(opertor, request);
 	}
 
@@ -163,7 +163,7 @@ public class ElasticsearchTemplate {
 		}
 	}
 
-	public Set<String> getAllIndex() throws DggEsException, IOException {
+	public Set<String> getAllIndex() throws ElasticsearchException, IOException {
 		Request request = new Request("GET", "/_aliases");
 		Response response = exec(allIndexOpertor, request);
 		Set<String> resSet;
@@ -198,7 +198,7 @@ public class ElasticsearchTemplate {
 			loop: for (T source : sources) {
 				if (fieldName == null) {
 					innerloop: for (Field s : source.getClass().getDeclaredFields())
-						if (s.isAnnotationPresent(DggEsIdentify.class)) {
+						if (s.isAnnotationPresent(ElasticsearchId.class)) {
 							field = s;
 							fieldName = field.getName();
 							break innerloop;
@@ -209,7 +209,7 @@ public class ElasticsearchTemplate {
 					field = source.getClass().getDeclaredField(fieldName);
 				field.setAccessible(true);
 				if (null == field.get(source))
-					throw new DggEsException("********注解的id值不能为null！");
+					throw new ElasticsearchException("********注解的id值不能为null！");
 				idList.add(field.get(source).toString());
 			}
 		}
@@ -218,10 +218,10 @@ public class ElasticsearchTemplate {
 
 	private String getIdByIdentify(Object source) throws Exception {
 		for (Field field : source.getClass().getDeclaredFields()) {
-			if (field.isAnnotationPresent(DggEsIdentify.class)) {
+			if (field.isAnnotationPresent(ElasticsearchId.class)) {
 				field.setAccessible(true);
 				if (null == field.get(source)) {
-					throw new DggEsException("********注解的id值不能为null！");
+					throw new ElasticsearchException("********注解的id值不能为null！");
 				}
 				return field.get(source).toString();
 			}
@@ -279,7 +279,7 @@ public class ElasticsearchTemplate {
 			String sourceAsString = response.getSourceAsString();
 			return JSONObject.parseObject(sourceAsString, clazz);
 		} else {
-			throw new DggEsException("index not found!");
+			throw new ElasticsearchException("index not found!");
 		}
 	}
 
@@ -297,7 +297,7 @@ public class ElasticsearchTemplate {
 		BulkRequest request = new BulkRequest();
 		List<String> idList = getIdByListIdentify(sources);
 		if (idList.size() == 0) {
-			throw new DggEsException("不明确的ID值，无法更新");
+			throw new ElasticsearchException("不明确的ID值，无法更新");
 		}
 		for (int i = 0; i < sources.size(); i++) {
 			T source = sources.get(i);

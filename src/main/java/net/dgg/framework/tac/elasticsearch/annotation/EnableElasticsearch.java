@@ -1,18 +1,16 @@
 package net.dgg.framework.tac.elasticsearch.annotation;
 
-/**
- * 索引es对象的id标识
- *
- * @author liuliwei
- * @create 2018-11-21
- */
-
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+import org.springframework.context.annotation.Import;
+
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DggEsIdentify {
+@Import(ElasticsearchRestClientBuilderConfiguration.class)
+@Documented
+public @interface EnableElasticsearch {
 }

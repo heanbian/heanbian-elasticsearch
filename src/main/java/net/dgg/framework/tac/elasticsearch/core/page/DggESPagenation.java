@@ -21,18 +21,8 @@ import net.dgg.framework.tac.elasticsearch.ElasticsearchTemplate;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggIPageCache;
 import net.dgg.framework.tac.elasticsearch.core.page.cache.DggLocalMemoryPageCache;
 
-/**
- * @Author: tumq
- * @Date: 2018/12/17
- * @Description: es深度分页搜索缓存，存储条件等必要数据
- */
-
+@SuppressWarnings("serial")
 public class DggESPagenation implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9022412092254850478L;
 
 	/** 需要搜索的索引名数组 */
 	private String[] indices;
@@ -158,8 +148,8 @@ public class DggESPagenation implements Serializable {
 		return currCondition;
 	}
 
-	public <T extends DggIPageModel> SearchHit[] queryHits(ElasticsearchTemplate template, DggPagenationCondtionEntity entity,
-			Class<T> beanCls) throws Exception {
+	public <T extends DggIPageModel> SearchHit[] queryHits(ElasticsearchTemplate template,
+			DggPagenationCondtionEntity entity, Class<T> beanCls) throws Exception {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 		// 添加外部查询条件
