@@ -24,9 +24,19 @@ public class HPaginationCondtion {
 
 	private HPaginationCondtion paginationCondtion;
 
+	public HPaginationCondtion() {
+		this.inputPageNo = 1;
+		this.inputPageSize = 10;
+	}
+
 	public HPaginationCondtion(int inputPageNumber, int inputPageSize) {
 		this.inputPageNo = inputPageNumber;
 		this.inputPageSize = inputPageSize;
+	}
+
+	public HPaginationCondtion(QueryBuilder queryBuilder, int inputPageNumber, int inputPageSize) {
+		this(inputPageNumber, inputPageSize);
+		this.inputBuilder = queryBuilder;
 	}
 
 	public int getMaxQueryNum() {
