@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 import com.heanbian.block.elasticsearch.client.annotation.ElasticsearchId;
 import com.heanbian.block.elasticsearch.client.executor.HExecutor;
-import com.heanbian.block.elasticsearch.client.executor.HRetryExecutor;
+import com.heanbian.block.elasticsearch.client.executor.HDefaultExecutor;
 import com.heanbian.block.elasticsearch.client.operator.HOperator;
 import com.heanbian.block.elasticsearch.client.operator.HighLevelOperator;
 import com.heanbian.block.elasticsearch.client.page.HPage;
@@ -50,7 +50,7 @@ public class HElasticsearchTemplate {
 	private SearchScrollDocumentOperator searchScrollDocumentOperator;
 
 	public HElasticsearchTemplate() {
-		executor = new HRetryExecutor(10);
+		executor = new HDefaultExecutor();
 		createIndexOperator = new CreateIndexOperator();
 		bulkDocumentOperator = new BulkDocmentOperator();
 		documentOperator = new GetDocumentOperator();
