@@ -7,8 +7,10 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 public class HPaginationCondtion {
+
 	/** 查询输入页码 */
 	private final int inputPageNo;
+
 	/** 查询输入每页大小 */
 	private final int inputPageSize;
 
@@ -22,7 +24,7 @@ public class HPaginationCondtion {
 
 	private HPaginationCondtion paginationCondtion;
 
-	HPaginationCondtion(int inputPageNumber, int inputPageSize) {
+	public HPaginationCondtion(int inputPageNumber, int inputPageSize) {
 		this.inputPageNo = inputPageNumber;
 		this.inputPageSize = inputPageSize;
 	}
