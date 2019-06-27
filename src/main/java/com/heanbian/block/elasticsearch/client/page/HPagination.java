@@ -25,9 +25,6 @@ public class HPagination implements Serializable {
 	/** 需要搜索的索引名数组 */
 	private String[] indices;
 
-	/** 需要搜索的type */
-	private String type;
-
 	/** 用来排序的字段名 */
 	private String sortFild;
 
@@ -102,7 +99,9 @@ public class HPagination implements Serializable {
 	}
 
 	void beforeQuery(int inputPageSize, QueryBuilder inputBuilder) {
-		String md5str = md5Encode(Arrays.toString(indices) + type + sortFild + inputPageSize + inputBuilder.toString());
+		StringBuilder b = new StringBuilder(Arrays.toString(indices)).append(sortFild).append(inputPageSize)
+				.append(inputBuilder.toString());
+		String md5str = md5Encode(b.toString());
 		if (uniqueString == null) {
 			uniqueString = md5str;
 		} else {
@@ -146,8 +145,8 @@ public class HPagination implements Serializable {
 		return c;
 	}
 
-	public <T extends HPage> SearchHit[] searchHits(HElasticsearchTemplate template,
-			HPaginationCondtionEntity entity, Class<T> clazz) {
+	public <T extends HPage> SearchHit[] searchHits(HElasticsearchTemplate template, HPaginationCondtionEntity entity,
+			Class<T> clazz) {
 		SearchSourceBuilder ssb = new SearchSourceBuilder();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 		// 添加外部查询条件
@@ -190,8 +189,8 @@ public class HPagination implements Serializable {
 		return hits;
 	}
 
-	public <T extends HPage> HPageResult<T> search(HElasticsearchTemplate template,
-			HPaginationCondtionEntity entity, Class<T> clazz) {
+	public <T extends HPage> HPageResult<T> search(HElasticsearchTemplate template, HPaginationCondtionEntity entity,
+			Class<T> clazz) {
 		HPageResult<T> result = new HPageResult<>();
 		result.setList(searchHits(template, entity, clazz), clazz,
 				entity.getSortOrder() == SortOrder.DESC ? false : true);
@@ -207,14 +206,6 @@ public class HPagination implements Serializable {
 
 	public void setIndices(String[] indices) {
 		this.indices = indices;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getSortFild() {
@@ -240,7 +231,7 @@ public class HPagination implements Serializable {
 		return pagenation.asString();
 	}
 
-	public static HPagination toESPagenation(String pagenationString) {
+	public static HPagination toPagination(String pagenationString) {
 		try (ObjectInputStream in = new ObjectInputStream(
 				new BufferedInputStream(new ByteArrayInputStream(toByteArray(pagenationString))))) {
 			return (HPagination) in.readObject();
