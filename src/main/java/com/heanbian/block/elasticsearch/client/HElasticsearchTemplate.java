@@ -171,7 +171,7 @@ public class HElasticsearchTemplate {
 	}
 
 	public <T> T findById(String index, String id, Class<T> clazz) {
-		GetResponse response = exec(documentOperator, new GetRequest(index, id));
+		GetResponse response = findById(index, id);
 		return JSONObject.parseObject(response.getSourceAsString(), clazz);
 	}
 
