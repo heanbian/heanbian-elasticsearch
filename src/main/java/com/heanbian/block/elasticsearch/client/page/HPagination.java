@@ -148,17 +148,18 @@ public class HPagination implements Serializable {
 		SearchHit[] hits = response.getHits().getHits();
 		// 保存查询出的记录首尾ID
 		if (hits.length > 0 && !pageCache.isHaveQuery(entity.getQueryPageNo())) {
+			SearchHit h1 = hits[hits.length - 1];
+			SearchHit h2 = hits[0];
 			if (entity.getSortOrder() == SortOrder.DESC) {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new HPaginationIdPair((Long) hits[hits.length - 1].getSourceAsMap().get(ID),
-								(Long) hits[0].getSourceAsMap().get(ID)));
+						new HPaginationIdPair(Long.valueOf((h1.getSourceAsMap().get(ID).toString())),
+								Long.valueOf(h2.getSourceAsMap().get(ID).toString())));
 			} else {
 				pageCache.saveQueryPage(entity.getQueryPageNo(),
-						new HPaginationIdPair((Long) hits[0].getSourceAsMap().get(ID),
-								(Long) hits[hits.length - 1].getSourceAsMap().get(ID)));
+						new HPaginationIdPair(Long.valueOf(h2.getSourceAsMap().get(ID).toString()),
+								Long.valueOf(h1.getSourceAsMap().get(ID).toString())));
 			}
 		}
-
 		return hits;
 	}
 
