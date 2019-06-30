@@ -9,13 +9,21 @@ import java.util.Map;
 
 import org.elasticsearch.search.SearchHit;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class HPageResult<I extends HPage> {
 
 	/** 当前页号 */
+	@JsonProperty("page_number")
 	private int pageNumber;
 
 	/** 每页大小 */
+	@JsonProperty("page_size")
 	private int pageSize;
+
+	/** 查询总页数 */
+	@JsonProperty("total_page")
+	private long totalPage;
 
 	/** 查询总数 */
 	private long total;
@@ -50,6 +58,11 @@ public class HPageResult<I extends HPage> {
 		this.total = total;
 	}
 
+	public long getTotalPage() {
+		// 总页数 = （总记录数 + 每页数据大小 - 1） / 每页数据大小
+		return (total + pageSize - 1) / pageSize;
+	}
+
 	public List<I> getList() {
 		return list;
 	}
@@ -58,13 +71,6 @@ public class HPageResult<I extends HPage> {
 		this.list = list;
 	}
 
-	/**
-	 * 将hits数组转换为list数组，但reverse为true时，list数组元素的顺序与hits数组元素的顺序相反
-	 * 
-	 * @param hits
-	 * @param beanCls
-	 * @param reverse
-	 */
 	public void setList(SearchHit[] hits, Class<I> clazz, boolean reverse) {
 		list = new ArrayList<>(hits.length);
 		for (int i = 0; i < hits.length; i++) {
