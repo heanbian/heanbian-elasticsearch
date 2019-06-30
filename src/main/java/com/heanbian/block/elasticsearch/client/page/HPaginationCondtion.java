@@ -108,7 +108,7 @@ public class HPaginationCondtion {
 			entity.setRangeQueryBuilder(
 					QueryBuilders.rangeQuery(HPagination.ID).gte(pair.getSmallId()).lte(pair.getBigId()));
 			entity.setQueryFromValue(0);
-		} else if (pagination.getLastPageNum() != null && inputPageNo == pagination.getLastPageNum()) {
+		} else if (pagination.getLastPageNum() == 0 && inputPageNo == pagination.getLastPageNum()) {
 			// 当输入的页码正好为最后一页，则直接按默认查询条件的倒序查询，若默认为倒序查询，则顺序查询
 			entity.setQueryPageSize(
 					pagination.getTotal() % inputPageSize > 0 ? (int) (pagination.getTotal() % inputPageSize)

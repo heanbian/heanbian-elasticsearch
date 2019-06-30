@@ -260,7 +260,7 @@ public class HElasticsearchTemplate {
 			}
 		} catch (Exception e) {
 		}
-		throw new RuntimeException("No \"@ElasticsearchId\" field found");
+		throw new RuntimeException("No @ElasticsearchId field found");
 	}
 
 }

@@ -1,10 +1,5 @@
 package com.heanbian.block.elasticsearch.client.page;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -16,6 +11,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
+import com.alibaba.fastjson.JSONObject;
 import com.heanbian.block.elasticsearch.client.HElasticsearchTemplate;
 
 @SuppressWarnings("serial")
@@ -25,15 +21,15 @@ public class HPagination implements Serializable {
 	private String[] indices;
 
 	/** 用来排序的字段名 */
-	private String sortFild;
+	private String sortField;
 
 	public final static String ID = "id";
 
 	/** 最后一页 */
-	private Long lastPageNum;
+	private long lastPageNum;
 
 	/** 查询总数 */
-	private Long total;
+	private long total;
 
 	private HPageCache pageCache;
 
@@ -45,13 +41,13 @@ public class HPagination implements Serializable {
 	/**
 	 * 为了记录前一次的页码
 	 */
-	private Long pageNum = 1L;
+	private long pageNum = 1L;
 
-	public Long getPageNum() {
+	public long getPageNum() {
 		return pageNum;
 	}
 
-	public void setPageNum(Long pageNum) {
+	public void setPageNum(long pageNum) {
 		this.pageNum = pageNum;
 	}
 
@@ -72,7 +68,7 @@ public class HPagination implements Serializable {
 	}
 
 	void beforeQuery(int inputPageSize, QueryBuilder inputBuilder) {
-		StringBuilder b = new StringBuilder(Arrays.toString(indices)).append(sortFild).append(inputPageSize)
+		StringBuilder b = new StringBuilder(Arrays.toString(indices)).append(sortField).append(inputPageSize)
 				.append(inputBuilder.toString());
 		String md5str = DigestUtils.md5Hex(b.toString());
 		if (uniqueString == null) {
@@ -81,27 +77,27 @@ public class HPagination implements Serializable {
 			if (!uniqueString.equals(md5str)) {
 				// 本对象条件已被改变，清除缓存，重新利用本对象进行查询，同时赋值最新的串
 				pageCache.clear();
-				total = null;
-				lastPageNum = null;
+				total = 0;
+				lastPageNum = 0;
 				uniqueString = md5str;
 				pageNum = 1L;
 			}
 		}
 	}
 
-	public Long getLastPageNum() {
+	public long getLastPageNum() {
 		return lastPageNum;
 	}
 
-	public void setLastPageNum(Long lastPageNum) {
+	public void setLastPageNum(long lastPageNum) {
 		this.lastPageNum = lastPageNum;
 	}
 
-	public Long getTotal() {
+	public long getTotal() {
 		return total;
 	}
 
-	public void setTotal(Long total) {
+	public void setTotal(long total) {
 		this.total = total;
 	}
 
@@ -131,16 +127,15 @@ public class HPagination implements Serializable {
 
 		ssb.from(entity.getQueryFromValue()).size(entity.getQueryPageSize());
 		ssb.sort(ID, entity.getSortOrder());
-		if (getSortFild() != null) {
-			ssb.sort(getSortFild(), entity.getSortOrder());
+		if (getSortField() != null) {
+			ssb.sort(getSortField(), entity.getSortOrder());
 		}
 		ssb.query(boolQuery);
 
-		// ES查询
 		SearchResponse response = template.search(ssb, getIndices());
 
 		// 保存总条数数据
-		if (total == null && lastPageNum == null) {
+		if (total == 0 && lastPageNum == 0) {
 			total = response.getHits().getTotalHits().value;
 			lastPageNum = total % entity.getQueryPageSize() > 0 ? total / entity.getQueryPageSize() + 1
 					: total / entity.getQueryPageSize();
@@ -163,13 +158,12 @@ public class HPagination implements Serializable {
 		return hits;
 	}
 
-	public <T extends HPage> HPageResult<T> search(HElasticsearchTemplate template, HPaginationCondtionEntity entity,
+	public <T extends HPage> HPageResult<T> search(HElasticsearchTemplate t, HPaginationCondtionEntity c,
 			Class<T> clazz) {
 		HPageResult<T> result = new HPageResult<>();
-		result.setList(searchHits(template, entity, clazz), clazz,
-				entity.getSortOrder() == SortOrder.DESC ? false : true);
-		result.setPageNumber(entity.getQueryPageNo());
-		result.setPageSize(entity.getQueryPageSize());
+		result.setList(searchHits(t, c, clazz), clazz);
+		result.setPageNumber(c.getQueryPageNo());
+		result.setPageSize(c.getQueryPageSize());
 		result.setTotal(total);
 		return result;
 	}
@@ -182,72 +176,20 @@ public class HPagination implements Serializable {
 		this.indices = indices;
 	}
 
-	public String getSortFild() {
-		return sortFild;
+	public String getSortField() {
+		return sortField;
 	}
 
-	public void setSortFild(String sortFild) {
-		this.sortFild = sortFild;
-	}
-
-	public String asString() {
-		try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-				ObjectOutputStream out = new ObjectOutputStream(bout)) {
-			out.writeObject(this);
-			return toHexString(bout.toByteArray());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public void setSortField(String sortField) {
+		this.sortField = sortField;
 	}
 
 	public static String toString(HPagination pagenation) {
-		return pagenation.asString();
+		return JSONObject.toJSONString(pagenation);
 	}
 
 	public static HPagination toPagination(String pagenationString) {
-		try (ObjectInputStream in = new ObjectInputStream(
-				new BufferedInputStream(new ByteArrayInputStream(toByteArray(pagenationString))))) {
-			return (HPagination) in.readObject();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+		return JSONObject.parseObject(pagenationString, HPagination.class);
 	}
 
-	public static byte[] toByteArray(String hexString) {
-		if (hexString == null || hexString.isEmpty()) {
-			throw new IllegalArgumentException("this hexString must not be empty");
-		}
-		final byte[] byteArray = new byte[hexString.length() / 2];
-		int k = 0;
-		for (int i = 0; i < byteArray.length; i++) {// 因为是16进制，最多只会占用4位，转换成字节需要两个16进制的字符，高位在先
-			byte high = (byte) (Character.digit(hexString.charAt(k), 16) & 0xff);
-			byte low = (byte) (Character.digit(hexString.charAt(k + 1), 16) & 0xff);
-			byteArray[i] = (byte) (high << 4 | low);
-			k += 2;
-		}
-		return byteArray;
-	}
-
-	/**
-	 * 字节数组转成16进制表示格式的字符串
-	 *
-	 * @param byteArray 需要转换的字节数组
-	 * @return 16进制表示格式的字符串
-	 **/
-	public static String toHexString(byte[] byteArray) {
-		if (byteArray == null || byteArray.length < 1) {
-			throw new IllegalArgumentException("this byteArray must not be null or empty");
-		}
-
-		final StringBuilder hexString = new StringBuilder();
-		for (int i = 0; i < byteArray.length; i++) {
-			if ((byteArray[i] & 0xff) < 0x10) {// 0~F前面不零
-				hexString.append("0");
-			}
-			hexString.append(Integer.toHexString(0xFF & byteArray[i]));
-		}
-		return hexString.toString();
-	}
 }

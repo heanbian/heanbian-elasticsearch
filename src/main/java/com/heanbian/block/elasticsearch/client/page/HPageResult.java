@@ -3,7 +3,6 @@ package com.heanbian.block.elasticsearch.client.page;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -71,9 +70,10 @@ public class HPageResult<I extends HPage> {
 		this.list = list;
 	}
 
-	public void setList(SearchHit[] hits, Class<I> clazz, boolean reverse) {
-		list = new ArrayList<>(hits.length);
-		for (int i = 0; i < hits.length; i++) {
+	public void setList(SearchHit[] hits, Class<I> clazz) {
+		final int len = hits.length;
+		list = new ArrayList<>(len);
+		for (int i = 0; i < len; i++) {
 			Map<String, Object> source = hits[i].getSourceAsMap();
 			try {
 				I model = clazz.newInstance();
@@ -85,22 +85,17 @@ public class HPageResult<I extends HPage> {
 				}
 				for (Field field : fieldList) {
 					field.setAccessible(true);
-					// Long类型专门处理
 					if (source.get(field.getName()) != null
 							&& "class java.lang.Long".equals(field.getType().toString())) {
-						field.set(model, (Long.parseLong(source.get(field.getName()).toString())));
+						field.set(model, Long.parseLong(source.get(field.getName()).toString()));
 					} else {
 						field.set(model, source.get(field.getName()));
 					}
 				}
 				list.add(model);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		if (reverse) {
-			Collections.reverse(list);
 		}
 	}
 }
