@@ -1,5 +1,7 @@
 package com.heanbian.block.elasticsearch.client.annotation;
 
+import java.util.Objects;
+
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -12,13 +14,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticsearchRestClientBuilderConfiguration {
 
-	@Value("${elasticsearch.cluster.node:}")
-	private String cluster_node;
+	@Value("${elasticsearch.cluster-nodes:}")
+	private String cluster_nodes;
 	private HttpHost[] hosts;
 
 	@Bean
 	public RestClientBuilder getRestClientBuilder() {
-		String[] nodes = cluster_node.split(",");
+		Objects.requireNonNull(cluster_nodes, "elasticsearch.cluster-nodes must not be null");
+		String[] nodes = cluster_nodes.split(",");
 		hosts = new HttpHost[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
 			String[] s = nodes[i].split(":");
