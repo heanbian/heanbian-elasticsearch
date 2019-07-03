@@ -140,7 +140,7 @@ public class HElasticsearchTemplate {
 		return exec(createIndexOperator, request);
 	}
 
-	public <T> BulkResponse bulkInsert(String index, @SuppressWarnings("unchecked") T... source) {
+	public <T> BulkResponse bulkInsert(String index, T source) {
 		return bulkInsert(index, Arrays.asList(source));
 	}
 
@@ -185,7 +185,7 @@ public class HElasticsearchTemplate {
 		return JSONObject.parseObject(response.getSourceAsString(), clazz);
 	}
 
-	public <T> BulkResponse bulkUpdate(String index, @SuppressWarnings("unchecked") T... source) {
+	public <T> BulkResponse bulkUpdate(String index, T source) {
 		return bulkUpdate(index, Arrays.asList(source));
 	}
 
