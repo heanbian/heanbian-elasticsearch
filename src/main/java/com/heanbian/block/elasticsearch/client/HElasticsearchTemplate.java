@@ -44,7 +44,7 @@ public class HElasticsearchTemplate {
 
 	private HExecutor executor;
 	private CreateIndexOperator createIndexOperator;
-	private BulkDocmentOperator bulkDocumentOperator;
+	private BulkDocumentOperator bulkDocumentOperator;
 	private GetDocumentOperator documentOperator;
 	private SearchDocumentOperator searchDocumentOperator;
 	private SearchScrollDocumentOperator searchScrollDocumentOperator;
@@ -52,7 +52,7 @@ public class HElasticsearchTemplate {
 	public HElasticsearchTemplate() {
 		executor = new HDefaultExecutor();
 		createIndexOperator = new CreateIndexOperator();
-		bulkDocumentOperator = new BulkDocmentOperator();
+		bulkDocumentOperator = new BulkDocumentOperator();
 		documentOperator = new GetDocumentOperator();
 		searchDocumentOperator = new SearchDocumentOperator();
 		searchScrollDocumentOperator = new SearchScrollDocumentOperator();
@@ -82,7 +82,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class BulkDocmentOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
+	public class BulkDocumentOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
 
 		@Override
 		public BulkResponse operator(RestHighLevelClient client, BulkRequest request) throws IOException {
