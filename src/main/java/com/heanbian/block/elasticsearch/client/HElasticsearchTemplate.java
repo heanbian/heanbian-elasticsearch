@@ -15,6 +15,8 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.ClearScrollRequest;
+import org.elasticsearch.action.search.ClearScrollResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
@@ -30,8 +32,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.heanbian.block.elasticsearch.client.annotation.ElasticsearchId;
-import com.heanbian.block.elasticsearch.client.executor.HExecutor;
 import com.heanbian.block.elasticsearch.client.executor.HDefaultExecutor;
+import com.heanbian.block.elasticsearch.client.executor.HExecutor;
 import com.heanbian.block.elasticsearch.client.operator.HOperator;
 import com.heanbian.block.elasticsearch.client.operator.HighLevelOperator;
 import com.heanbian.block.elasticsearch.client.page.HPage;
@@ -48,6 +50,7 @@ public class HElasticsearchTemplate {
 	private GetDocumentOperator documentOperator;
 	private SearchDocumentOperator searchDocumentOperator;
 	private SearchScrollDocumentOperator searchScrollDocumentOperator;
+	private ClearScrollOperator clearScrollOperator;
 
 	public HElasticsearchTemplate() {
 		executor = new HDefaultExecutor();
@@ -56,6 +59,7 @@ public class HElasticsearchTemplate {
 		documentOperator = new GetDocumentOperator();
 		searchDocumentOperator = new SearchDocumentOperator();
 		searchScrollDocumentOperator = new SearchScrollDocumentOperator();
+		clearScrollOperator = new ClearScrollOperator();
 	}
 
 	public HExecutor getExecutor() {
@@ -114,6 +118,14 @@ public class HElasticsearchTemplate {
 		}
 	}
 
+	public class ClearScrollOperator extends HighLevelOperator<ClearScrollRequest, ClearScrollResponse> {
+
+		@Override
+		public ClearScrollResponse operator(RestHighLevelClient client, ClearScrollRequest request) throws IOException {
+			return client.clearScroll(request, getRequestOptions());
+		}
+	}
+
 	public CreateIndexResponse createIndex(String index, int shards, int replicas) {
 		return createIndex(index, shards, replicas, null);
 	}
@@ -128,11 +140,7 @@ public class HElasticsearchTemplate {
 		return exec(createIndexOperator, request);
 	}
 
-	public <T> BulkResponse bulkInsert(String index, T source) {
-		return bulkInsert(index, Arrays.asList(source));
-	}
-
-	public <T> BulkResponse bulkInsert(String index, T[] source) {
+	public <T> BulkResponse bulkInsert(String index, @SuppressWarnings("unchecked") T... source) {
 		return bulkInsert(index, Arrays.asList(source));
 	}
 
@@ -148,15 +156,12 @@ public class HElasticsearchTemplate {
 		return exec(bulkDocumentOperator, request);
 	}
 
-	public BulkResponse bulkDelete(String index, String id) {
-		return bulkDelete(index, Arrays.asList(id));
-	}
-
-	public BulkResponse bulkDelete(String index, String[] id) {
-		return bulkDelete(index, Arrays.asList(id));
+	public BulkResponse bulkDelete(String index, String... ids) {
+		return bulkDelete(index, Arrays.asList(ids));
 	}
 
 	public BulkResponse bulkDelete(String index, List<String> ids) {
+		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(ids, "ids must not be null");
 
 		BulkRequest request = new BulkRequest();
@@ -167,19 +172,20 @@ public class HElasticsearchTemplate {
 	}
 
 	public GetResponse findById(String index, String id) {
+		Objects.requireNonNull(index, "index must not be null");
+		Objects.requireNonNull(id, "id must not be null");
+
 		return exec(documentOperator, new GetRequest(index, id));
 	}
 
 	public <T> T findById(String index, String id, Class<T> clazz) {
+		Objects.requireNonNull(clazz, "clazz must not be null");
+
 		GetResponse response = findById(index, id);
 		return JSONObject.parseObject(response.getSourceAsString(), clazz);
 	}
 
-	public <T> BulkResponse bulkUpdate(String index, T source) {
-		return bulkUpdate(index, Arrays.asList(source));
-	}
-
-	public <T> BulkResponse bulkUpdate(String index, T[] source) {
+	public <T> BulkResponse bulkUpdate(String index, @SuppressWarnings("unchecked") T... source) {
 		return bulkUpdate(index, Arrays.asList(source));
 	}
 
@@ -195,12 +201,16 @@ public class HElasticsearchTemplate {
 		return exec(this.bulkDocumentOperator, request);
 	}
 
-	public SearchResponse search(SearchSourceBuilder sourceBuilder, String... indices) {
-		return search(sourceBuilder, null, indices);
+	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String... indices) {
+		return search(searchSourceBuilder, null, indices);
 	}
 
-	public <T> List<T> search(SearchSourceBuilder sourceBuilder, String[] indices, Class<T> clazz) {
-		SearchResponse response = search(sourceBuilder, null, indices);
+	public <T> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices, Class<T> clazz) {
+		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		Objects.requireNonNull(indices, "indices must not be null");
+		Objects.requireNonNull(clazz, "clazz must not be null");
+
+		SearchResponse response = search(searchSourceBuilder, null, indices);
 		List<T> res = new ArrayList<>();
 		SearchHit[] hits = response.getHits().getHits();
 		for (SearchHit h : hits) {
@@ -209,9 +219,12 @@ public class HElasticsearchTemplate {
 		return res;
 	}
 
-	public SearchResponse search(SearchSourceBuilder sourceBuilder, String keepAlive, String[] indices) {
+	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String keepAlive, String[] indices) {
+		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		Objects.requireNonNull(indices, "indices must not be null");
+
 		SearchRequest request = new SearchRequest(indices);
-		request.source(sourceBuilder);
+		request.source(searchSourceBuilder);
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
 		}
@@ -223,6 +236,8 @@ public class HElasticsearchTemplate {
 	}
 
 	public SearchResponse searchScroll(String scrollId, String keepAlive) {
+		Objects.requireNonNull(scrollId, "scrollId must not be null");
+
 		SearchScrollRequest request = new SearchScrollRequest(scrollId);
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
@@ -230,7 +245,22 @@ public class HElasticsearchTemplate {
 		return exec(searchScrollDocumentOperator, request);
 	}
 
+	public ClearScrollResponse clearScroll(String... scrollId) {
+		return clearScroll(Arrays.asList(scrollId));
+	}
+
+	public ClearScrollResponse clearScroll(List<String> scrollIds) {
+		Objects.requireNonNull(scrollIds, "scrollId must not be null");
+
+		ClearScrollRequest request = new ClearScrollRequest();
+		request.scrollIds(scrollIds);
+		return exec(clearScrollOperator, request);
+	}
+
 	public <T extends HPage> HPageResult<T> searchDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
+		Objects.requireNonNull(condtion, "condtion must not be null");
+		Objects.requireNonNull(clazz, "clazz must not be null");
+
 		for (;;) {
 			HPaginationCondtionEntity entity = condtion.calcPaginationCondtionEntity();
 
@@ -260,7 +290,7 @@ public class HElasticsearchTemplate {
 			}
 		} catch (Exception e) {
 		}
-		throw new RuntimeException("No @ElasticsearchId field found");
+		throw new RuntimeException("No @ElasticsearchId field was found on class");
 	}
 
 }
