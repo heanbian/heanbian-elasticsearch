@@ -1,13 +1,11 @@
 package com.heanbian.block.elasticsearch.client.page;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.elasticsearch.search.SearchHit;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HPageResult<I extends HPage> {
@@ -72,30 +70,10 @@ public class HPageResult<I extends HPage> {
 
 	public void setList(SearchHit[] hits, Class<I> clazz) {
 		final int len = hits.length;
-		list = new ArrayList<>(len);
+		this.list = new ArrayList<>(len);
 		for (int i = 0; i < len; i++) {
-			Map<String, Object> source = hits[i].getSourceAsMap();
-			try {
-				I model = clazz.newInstance();
-				List<Field> fieldList = new ArrayList<>();
-				Class<?> tempClass = model.getClass();
-				while (tempClass != null) {
-					fieldList.addAll(Arrays.asList(tempClass.getDeclaredFields()));
-					tempClass = tempClass.getSuperclass();
-				}
-				for (Field field : fieldList) {
-					field.setAccessible(true);
-					if (source.get(field.getName()) != null
-							&& "class java.lang.Long".equals(field.getType().toString())) {
-						field.set(model, Long.parseLong(source.get(field.getName()).toString()));
-					} else {
-						field.set(model, source.get(field.getName()));
-					}
-				}
-				list.add(model);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			list.add(JSON.parseObject(hits[i].getSourceAsString(), clazz));
 		}
 	}
+
 }
