@@ -312,9 +312,13 @@ public class HElasticsearchTemplate {
 
 		long total = response.getHits().getTotalHits().value;
 		List<T> data = new ArrayList<>();
-		for (int i = 0; i < pageNumber; i++) {
+		loop: for (int i = 0; i < pageNumber; i++) {
 			if (i == (pageNumber - 1)) {
-				for (SearchHit hit : response.getHits().getHits()) {
+				SearchHit[] hits = response.getHits().getHits();
+				if (hits.length <= 0) {
+					break loop;
+				}
+				for (SearchHit hit : hits) {
 					data.add(JSON.parseObject(hit.getSourceAsString(), clazz));
 				}
 			}
