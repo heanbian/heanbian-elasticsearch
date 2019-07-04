@@ -30,6 +30,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.heanbian.block.elasticsearch.client.annotation.ElasticsearchId;
 import com.heanbian.block.elasticsearch.client.executor.HDefaultExecutor;
@@ -291,6 +292,42 @@ public class HElasticsearchTemplate {
 		} catch (Exception e) {
 		}
 		throw new RuntimeException("No @ElasticsearchId field was found on class");
+	}
+
+	public <T extends HPage> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			int pageNumber, int pageSize, String index, String keepAlive, Class<T> clazz) {
+		return searchScrollDeepPaging(searchSourceBuilder, pageNumber, pageSize, new String[] { index }, keepAlive,
+				clazz);
+	}
+
+	public <T extends HPage> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			final int pageNumber, final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
+
+		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		Objects.requireNonNull(indices, "indices must not be null");
+		Objects.requireNonNull(clazz, "clazz must not be null");
+
+		searchSourceBuilder.from(0).size(pageSize);// scroll from=0
+		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
+
+		long total = response.getHits().getTotalHits().value;
+		List<T> data = new ArrayList<>();
+		for (int i = 0; i < pageNumber; i++) {
+			if (i == (pageNumber - 1)) {
+				for (SearchHit hit : response.getHits().getHits()) {
+					data.add(JSON.parseObject(hit.getSourceAsString(), clazz));
+				}
+			}
+			response = searchScroll(response.getScrollId(), keepAlive);
+		}
+		clearScroll(response.getScrollId());
+
+		HPageResult<T> result = new HPageResult<>();
+		result.setList(data);
+		result.setPageNumber(pageNumber);
+		result.setPageSize(pageSize);
+		result.setTotal(total);
+		return result;
 	}
 
 }
