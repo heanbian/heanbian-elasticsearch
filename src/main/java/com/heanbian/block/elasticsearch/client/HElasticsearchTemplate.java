@@ -311,7 +311,7 @@ public class HElasticsearchTemplate {
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
 
 		long total = response.getHits().getTotalHits().value;
-		List<T> data = new ArrayList<>();
+		List<T> tss = new ArrayList<>();
 		loop: for (int i = 0; i < pageNumber; i++) {
 			SearchHit[] hits = response.getHits().getHits();
 			if (hits == null || hits.length <= 0) {
@@ -319,7 +319,7 @@ public class HElasticsearchTemplate {
 			}
 			if (i == (pageNumber - 1)) {
 				for (SearchHit hit : hits) {
-					data.add(JSON.parseObject(hit.getSourceAsString(), clazz));
+					tss.add(JSON.parseObject(hit.getSourceAsString(), clazz));
 				}
 			}
 			response = searchScroll(response.getScrollId(), keepAlive);
@@ -327,7 +327,7 @@ public class HElasticsearchTemplate {
 		clearScroll(response.getScrollId());
 
 		HPageResult<T> result = new HPageResult<>();
-		result.setList(data);
+		result.setList(tss);
 		result.setPageNumber(pageNumber);
 		result.setPageSize(pageSize);
 		result.setTotal(total);
