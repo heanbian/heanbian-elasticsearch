@@ -8,6 +8,37 @@
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>heanbian</id>
+			<name>heanbian</name>
+			<email>heanbian@heanbian.com</email>
+			<organization>heanbian.com</organization>
+			<organizationUrl>https://www.heanbian.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/heanbian/heanbian-elasticsearch-client.git</connection>
+		<developerConnection>scm:git:https://github.com/heanbian/heanbian-elasticsearch-client.git</developerConnection>
+		<url>https://github.com/heanbian/heanbian-elasticsearch-client</url>
+	</scm>
+
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/heanbian/heanbian-elasticsearch-client/issues</url>
+	</issueManagement>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>5.1.8.RELEASE</spring.version>
@@ -17,6 +48,12 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.sonatype.oss</groupId>
+			<artifactId>oss-parent</artifactId>
+			<version>9</version>
+			<type>pom</type>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
