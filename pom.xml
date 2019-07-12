@@ -8,6 +8,12 @@
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>9</version>
+	</parent>
+
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
@@ -48,12 +54,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.sonatype.oss</groupId>
-			<artifactId>oss-parent</artifactId>
-			<version>9</version>
-			<type>pom</type>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
