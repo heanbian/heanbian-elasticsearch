@@ -1,4 +1,3 @@
-
 package com.heanbian.block.elasticsearch.client;
 
 import java.io.IOException;
@@ -31,35 +30,31 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.heanbian.block.elasticsearch.client.annotation.ElasticsearchId;
 import com.heanbian.block.elasticsearch.client.executor.HDefaultExecutor;
 import com.heanbian.block.elasticsearch.client.executor.HExecutor;
 import com.heanbian.block.elasticsearch.client.operator.HOperator;
 import com.heanbian.block.elasticsearch.client.operator.HighLevelOperator;
-import com.heanbian.block.elasticsearch.client.page.HPage;
 import com.heanbian.block.elasticsearch.client.page.HPageResult;
-import com.heanbian.block.elasticsearch.client.page.HPaginationCondtion;
-import com.heanbian.block.elasticsearch.client.page.HPaginationCondtionEntity;
 
 @Component
 public class HElasticsearchTemplate {
 
 	private HExecutor executor;
 	private CreateIndexOperator createIndexOperator;
-	private BulkDocumentOperator bulkDocumentOperator;
-	private GetDocumentOperator documentOperator;
-	private SearchDocumentOperator searchDocumentOperator;
-	private SearchScrollDocumentOperator searchScrollDocumentOperator;
+	private BulkOperator bulkOperator;
+	private GetOperator operator;
+	private SearchOperator searchOperator;
+	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
 
 	public HElasticsearchTemplate() {
 		executor = new HDefaultExecutor();
 		createIndexOperator = new CreateIndexOperator();
-		bulkDocumentOperator = new BulkDocumentOperator();
-		documentOperator = new GetDocumentOperator();
-		searchDocumentOperator = new SearchDocumentOperator();
-		searchScrollDocumentOperator = new SearchScrollDocumentOperator();
+		bulkOperator = new BulkOperator();
+		operator = new GetOperator();
+		searchOperator = new SearchOperator();
+		searchScrollOperator = new SearchScrollOperator();
 		clearScrollOperator = new ClearScrollOperator();
 	}
 
@@ -87,7 +82,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class BulkDocumentOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
+	public class BulkOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
 
 		@Override
 		public BulkResponse operator(RestHighLevelClient client, BulkRequest request) throws IOException {
@@ -95,7 +90,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class GetDocumentOperator extends HighLevelOperator<GetRequest, GetResponse> {
+	public class GetOperator extends HighLevelOperator<GetRequest, GetResponse> {
 
 		@Override
 		public GetResponse operator(RestHighLevelClient client, GetRequest request) throws IOException {
@@ -103,7 +98,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class SearchDocumentOperator extends HighLevelOperator<SearchRequest, SearchResponse> {
+	public class SearchOperator extends HighLevelOperator<SearchRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchRequest request) throws IOException {
@@ -111,7 +106,7 @@ public class HElasticsearchTemplate {
 		}
 	}
 
-	public class SearchScrollDocumentOperator extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
+	public class SearchScrollOperator extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
 
 		@Override
 		public SearchResponse operator(RestHighLevelClient client, SearchScrollRequest request) throws IOException {
@@ -151,10 +146,10 @@ public class HElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new IndexRequest(index).id(getElasticsearchId(d)).source(JSONObject.toJSONString(d),
-					XContentType.JSON));
+			request.add(
+					new IndexRequest(index).id(getElasticsearchId(d)).source(JSON.toJSONString(d), XContentType.JSON));
 		});
-		return exec(bulkDocumentOperator, request);
+		return exec(bulkOperator, request);
 	}
 
 	public BulkResponse bulkDelete(String index, String... ids) {
@@ -169,21 +164,21 @@ public class HElasticsearchTemplate {
 		ids.forEach(d -> {
 			request.add(new DeleteRequest(index, d));
 		});
-		return exec(bulkDocumentOperator, request);
+		return exec(bulkOperator, request);
 	}
 
 	public GetResponse findById(String index, String id) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(id, "id must not be null");
 
-		return exec(documentOperator, new GetRequest(index, id));
+		return exec(operator, new GetRequest(index, id));
 	}
 
 	public <T> T findById(String index, String id, Class<T> clazz) {
 		Objects.requireNonNull(clazz, "clazz must not be null");
 
 		GetResponse response = findById(index, id);
-		return JSONObject.parseObject(response.getSourceAsString(), clazz);
+		return JSON.parseObject(response.getSourceAsString(), clazz);
 	}
 
 	public <T> BulkResponse bulkUpdate(String index, T source) {
@@ -196,10 +191,9 @@ public class HElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(
-					new UpdateRequest(index, getElasticsearchId(d)).doc(JSONObject.toJSONString(d), XContentType.JSON));
+			request.add(new UpdateRequest(index, getElasticsearchId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
 		});
-		return exec(this.bulkDocumentOperator, request);
+		return exec(bulkOperator, request);
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String... indices) {
@@ -212,12 +206,12 @@ public class HElasticsearchTemplate {
 		Objects.requireNonNull(clazz, "clazz must not be null");
 
 		SearchResponse response = search(searchSourceBuilder, null, indices);
-		List<T> res = new ArrayList<>();
+		List<T> rs = new ArrayList<>();
 		SearchHit[] hits = response.getHits().getHits();
 		for (SearchHit h : hits) {
-			res.add(JSONObject.parseObject(h.getSourceAsString(), clazz));
+			rs.add(JSON.parseObject(h.getSourceAsString(), clazz));
 		}
-		return res;
+		return rs;
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String keepAlive, String[] indices) {
@@ -229,7 +223,7 @@ public class HElasticsearchTemplate {
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
 		}
-		return exec(searchDocumentOperator, request);
+		return exec(searchOperator, request);
 	}
 
 	public SearchResponse searchScroll(String scrollId) {
@@ -243,7 +237,7 @@ public class HElasticsearchTemplate {
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
 		}
-		return exec(searchScrollDocumentOperator, request);
+		return exec(searchScrollOperator, request);
 	}
 
 	public ClearScrollResponse clearScroll(String... scrollId) {
@@ -251,32 +245,11 @@ public class HElasticsearchTemplate {
 	}
 
 	public ClearScrollResponse clearScroll(List<String> scrollIds) {
-		Objects.requireNonNull(scrollIds, "scrollId must not be null");
+		Objects.requireNonNull(scrollIds, "scrollIds must not be null");
 
 		ClearScrollRequest request = new ClearScrollRequest();
 		request.scrollIds(scrollIds);
 		return exec(clearScrollOperator, request);
-	}
-
-	public <T extends HPage> HPageResult<T> searchDeepPaging(HPaginationCondtion condtion, Class<T> clazz) {
-		Objects.requireNonNull(condtion, "condtion must not be null");
-		Objects.requireNonNull(clazz, "clazz must not be null");
-
-		for (;;) {
-			HPaginationCondtionEntity entity = condtion.calcPaginationCondtionEntity();
-
-			if (entity.getQueryFromValue() >= condtion.getMaxQueryNum()) {
-				condtion = condtion.nextQueryCondion(entity.getSortOrder());
-				continue;
-			}
-			if (entity.getQueryPageNo() != condtion.getInputPageNo()) {
-				condtion.getPagination().searchHits(this, entity, clazz);
-				condtion = condtion.getPaginationCondtion();
-				continue;
-			}
-
-			return condtion.getPagination().search(this, entity, clazz);
-		}
 	}
 
 	private <T> String getElasticsearchId(T source) {
@@ -294,14 +267,14 @@ public class HElasticsearchTemplate {
 		throw new RuntimeException("No @ElasticsearchId field was found on class");
 	}
 
-	public <T extends HPage> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
-			int pageNumber, int pageSize, String index, String keepAlive, Class<T> clazz) {
+	public <T> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder, int pageNumber,
+			int pageSize, String index, String keepAlive, Class<T> clazz) {
 		return searchScrollDeepPaging(searchSourceBuilder, pageNumber, pageSize, new String[] { index }, keepAlive,
 				clazz);
 	}
 
-	public <T extends HPage> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
-			final int pageNumber, final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
+	public <T> HPageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder, final int pageNumber,
+			final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
 
 		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
 		Objects.requireNonNull(indices, "indices must not be null");
@@ -326,12 +299,12 @@ public class HElasticsearchTemplate {
 		}
 		clearScroll(response.getScrollId());
 
-		HPageResult<T> result = new HPageResult<>();
-		result.setList(tss);
-		result.setPageNumber(pageNumber);
-		result.setPageSize(pageSize);
-		result.setTotal(total);
-		return result;
+		HPageResult<T> rs = new HPageResult<>();
+		rs.setList(tss);
+		rs.setPageNumber(pageNumber);
+		rs.setPageSize(pageSize);
+		rs.setTotal(total);
+		return rs;
 	}
 
 }

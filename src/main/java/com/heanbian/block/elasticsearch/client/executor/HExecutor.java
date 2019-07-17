@@ -4,6 +4,6 @@ import com.heanbian.block.elasticsearch.client.operator.HOperator;
 
 public interface HExecutor {
 
-	public <E, R, S> S exec(HOperator<E, R, S> operator, R request);
+	<E, R, S> S exec(HOperator<E, R, S> operator, R request);
 
 }

@@ -7,15 +7,15 @@ import org.elasticsearch.client.RestClientBuilder;
 
 public interface HOperator<E, R, S> {
 
-	public E getRestClient();
+	E getRestClient();
 
-	public S operator(E client, R request) throws IOException;
+	S operator(E client, R request) throws IOException;
 
-	public RestClientBuilder getBuilder();
+	RestClientBuilder getBuilder();
 
-	public void setBuilder(RestClientBuilder builder);
+	void setBuilder(RestClientBuilder builder);
 
-	public RequestOptions getRequestOptions();
+	RequestOptions getRequestOptions();
 
-	public void setRequestOptions(RequestOptions requestOptions);
+	void setRequestOptions(RequestOptions requestOptions);
 }
