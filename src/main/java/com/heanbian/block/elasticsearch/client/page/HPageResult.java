@@ -40,35 +40,37 @@ public class HPageResult<I> {
 	 */
 	private List<I> list;
 
-	public HPageResult() {
-	}
+	public HPageResult() {}
 
 	public int getPageNumber() {
 		return pageNumber;
 	}
 
-	public void setPageNumber(int pageNumber) {
+	public HPageResult<I> setPageNumber(int pageNumber) {
 		this.pageNumber = pageNumber;
+		return this;
 	}
 
 	public int getPageSize() {
 		return pageSize;
 	}
 
-	public void setPageSize(int pageSize) {
+	public HPageResult<I> setPageSize(int pageSize) {
 		this.pageSize = pageSize;
+		return this;
 	}
 
 	public long getTotal() {
 		return total;
 	}
 
-	public void setTotal(long total) {
+	public HPageResult<I> setTotal(long total) {
 		this.total = total;
+		return this;
 	}
 
+	// 总页数 = （总记录数 + 每页数据大小 - 1） / 每页数据大小
 	public long getTotalPage() {
-		// 总页数 = （总记录数 + 每页数据大小 - 1） / 每页数据大小
 		return (total + pageSize - 1) / pageSize;
 	}
 
@@ -76,16 +78,20 @@ public class HPageResult<I> {
 		return list;
 	}
 
-	public void setList(List<I> list) {
+	public HPageResult<I> setList(List<I> list) {
 		this.list = list;
+		return this;
 	}
 
-	public void setList(SearchHit[] hits, Class<I> clazz) {
+	public HPageResult<I> setList(SearchHit[] hits, Class<I> clazz) {
 		final int len = hits.length;
-		this.list = new ArrayList<>(len);
+		if (list == null) {
+			list = new ArrayList<>(len);
+		}
 		for (int i = 0; i < len; i++) {
 			list.add(JSON.parseObject(hits[i].getSourceAsString(), clazz));
 		}
+		return this;
 	}
 
 }

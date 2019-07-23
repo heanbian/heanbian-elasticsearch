@@ -70,8 +70,8 @@ public class HElasticsearchTemplate {
 		return executor.exec(operator, request);
 	}
 
-	public <R, S> S execHighLevel(HighLevelOperator<R, S> opertor, R request) {
-		return executor.exec(opertor, request);
+	public <R, S> S execHighLevel(HighLevelOperator<R, S> operator, R request) {
+		return executor.exec(operator, request);
 	}
 
 	public class CreateIndexOperator extends HighLevelOperator<CreateIndexRequest, CreateIndexResponse> {
@@ -146,8 +146,7 @@ public class HElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(
-					new IndexRequest(index).id(getElasticsearchId(d)).source(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new IndexRequest(index).id(getId(d)).source(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -161,8 +160,8 @@ public class HElasticsearchTemplate {
 		Objects.requireNonNull(ids, "ids must not be null");
 
 		BulkRequest request = new BulkRequest();
-		ids.forEach(d -> {
-			request.add(new DeleteRequest(index, d));
+		ids.forEach(id -> {
+			request.add(new DeleteRequest(index, id));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -191,7 +190,7 @@ public class HElasticsearchTemplate {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, getElasticsearchId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new UpdateRequest(index, getId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -252,7 +251,7 @@ public class HElasticsearchTemplate {
 		return exec(clearScrollOperator, request);
 	}
 
-	private <T> String getElasticsearchId(T source) {
+	private <T> String getId(T source) {
 		try {
 			for (Field f : source.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(ElasticsearchId.class)) {
@@ -299,12 +298,7 @@ public class HElasticsearchTemplate {
 		}
 		clearScroll(response.getScrollId());
 
-		HPageResult<T> rs = new HPageResult<>();
-		rs.setList(tss);
-		rs.setPageNumber(pageNumber);
-		rs.setPageSize(pageSize);
-		rs.setTotal(total);
-		return rs;
+		return new HPageResult<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
 
 }
