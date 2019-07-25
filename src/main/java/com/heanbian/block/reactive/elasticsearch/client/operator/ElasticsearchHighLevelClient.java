@@ -1,4 +1,4 @@
-package com.heanbian.block.elasticsearch.client.operator;
+package com.heanbian.block.reactive.elasticsearch.client.operator;
 
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -9,14 +9,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HElasticsearchHighLevelClient implements ApplicationContextAware {
+public class ElasticsearchHighLevelClient implements ApplicationContextAware {
 
 	private RestHighLevelClient restHighLevelClient;
 
 	@Autowired
 	private RestClientBuilder restClientBuilder;
 
-	private static HElasticsearchHighLevelClient client;
+	private static ElasticsearchHighLevelClient client;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -24,7 +24,7 @@ public class HElasticsearchHighLevelClient implements ApplicationContextAware {
 		client = this;
 	}
 
-	public final static HElasticsearchHighLevelClient getInstance() {
+	public final static ElasticsearchHighLevelClient getInstance() {
 		return client;
 	}
 

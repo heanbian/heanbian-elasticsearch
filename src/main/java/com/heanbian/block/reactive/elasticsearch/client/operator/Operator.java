@@ -1,11 +1,11 @@
-package com.heanbian.block.elasticsearch.client.operator;
+package com.heanbian.block.reactive.elasticsearch.client.operator;
 
 import java.io.IOException;
 
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 
-public interface HOperator<E, R, S> {
+public interface Operator<E, R, S> {
 
 	E getRestClient();
 

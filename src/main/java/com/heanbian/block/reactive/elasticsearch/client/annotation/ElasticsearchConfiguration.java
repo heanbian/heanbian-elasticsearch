@@ -1,4 +1,4 @@
-package com.heanbian.block.elasticsearch.client.annotation;
+package com.heanbian.block.reactive.elasticsearch.client.annotation;
 
 import java.util.Objects;
 
@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@ComponentScan("com.heanbian.block.elasticsearch.client")
+@ComponentScan("com.heanbian.block.reactive.elasticsearch.client")
 @Configuration
-public class ElasticsearchRestClientBuilderConfiguration {
+public class ElasticsearchConfiguration {
 
 	@Value("${elasticsearch.cluster-nodes:}")
 	private String cluster_nodes;

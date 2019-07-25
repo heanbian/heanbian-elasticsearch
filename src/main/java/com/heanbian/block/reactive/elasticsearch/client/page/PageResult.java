@@ -1,4 +1,4 @@
-package com.heanbian.block.elasticsearch.client.page;
+package com.heanbian.block.reactive.elasticsearch.client.page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HPageResult<I> {
+public class PageResult<I> {
 
 	/**
 	 * 当前页号
@@ -40,13 +40,13 @@ public class HPageResult<I> {
 	 */
 	private List<I> list;
 
-	public HPageResult() {}
+	public PageResult() {}
 
 	public int getPageNumber() {
 		return pageNumber;
 	}
 
-	public HPageResult<I> setPageNumber(int pageNumber) {
+	public PageResult<I> setPageNumber(int pageNumber) {
 		this.pageNumber = pageNumber;
 		return this;
 	}
@@ -55,7 +55,7 @@ public class HPageResult<I> {
 		return pageSize;
 	}
 
-	public HPageResult<I> setPageSize(int pageSize) {
+	public PageResult<I> setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 		return this;
 	}
@@ -64,7 +64,7 @@ public class HPageResult<I> {
 		return total;
 	}
 
-	public HPageResult<I> setTotal(long total) {
+	public PageResult<I> setTotal(long total) {
 		this.total = total;
 		return this;
 	}
@@ -78,12 +78,12 @@ public class HPageResult<I> {
 		return list;
 	}
 
-	public HPageResult<I> setList(List<I> list) {
+	public PageResult<I> setList(List<I> list) {
 		this.list = list;
 		return this;
 	}
 
-	public HPageResult<I> setList(SearchHit[] hits, Class<I> clazz) {
+	public PageResult<I> setList(SearchHit[] hits, Class<I> clazz) {
 		final int len = hits.length;
 		if (list == null) {
 			list = new ArrayList<>(len);

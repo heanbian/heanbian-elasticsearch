@@ -1,4 +1,4 @@
-package com.heanbian.block.elasticsearch.client.annotation;
+package com.heanbian.block.reactive.elasticsearch.client.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(ElasticsearchRestClientBuilderConfiguration.class)
+@Import(ElasticsearchConfiguration.class)
 @Documented
 public @interface EnableElasticsearch {
 }
