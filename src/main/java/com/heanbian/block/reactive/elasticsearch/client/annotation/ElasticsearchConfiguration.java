@@ -7,22 +7,21 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@ComponentScan("com.heanbian.block.reactive.elasticsearch.client")
+import com.heanbian.block.reactive.elasticsearch.client.ElasticsearchTemplate;
+
 @Configuration
 public class ElasticsearchConfiguration {
 
 	@Value("${elasticsearch.cluster-nodes:}")
-	private String cluster_nodes;
-	private HttpHost[] hosts;
+	private String clusterNodes;
 
 	@Bean
-	public RestClientBuilder getRestClientBuilder() {
-		Objects.requireNonNull(cluster_nodes, "elasticsearch.cluster-nodes must not be null");
-		String[] nodes = cluster_nodes.split(",");
-		hosts = new HttpHost[nodes.length];
+	public RestClientBuilder restClientBuilder() {
+		Objects.requireNonNull(clusterNodes, "elasticsearch.cluster-nodes must be set");
+		String[] nodes = clusterNodes.split(",");
+		HttpHost[] hosts = new HttpHost[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
 			String[] s = nodes[i].split(":");
 			if (s.length == 2) {
@@ -30,6 +29,11 @@ public class ElasticsearchConfiguration {
 			}
 		}
 		return RestClient.builder(hosts);
+	}
+
+	@Bean
+	public ElasticsearchTemplate elasticsearchTemplate() {
+		return new ElasticsearchTemplate();
 	}
 
 }

@@ -27,18 +27,17 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.InitializingBean;
 
 import com.alibaba.fastjson.JSON;
 import com.heanbian.block.reactive.elasticsearch.client.annotation.ElasticsearchId;
 import com.heanbian.block.reactive.elasticsearch.client.executor.DefaultExecutor;
 import com.heanbian.block.reactive.elasticsearch.client.executor.Executor;
-import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
 import com.heanbian.block.reactive.elasticsearch.client.operator.HighLevelOperator;
+import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
 import com.heanbian.block.reactive.elasticsearch.client.page.PageResult;
 
-@Component
-public class ElasticsearchTemplate {
+public class ElasticsearchTemplate implements InitializingBean {
 
 	private Executor executor;
 	private CreateIndexOperator createIndexOperator;
@@ -47,16 +46,6 @@ public class ElasticsearchTemplate {
 	private SearchOperator searchOperator;
 	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
-
-	public ElasticsearchTemplate() {
-		executor = new DefaultExecutor();
-		createIndexOperator = new CreateIndexOperator();
-		bulkOperator = new BulkOperator();
-		operator = new GetOperator();
-		searchOperator = new SearchOperator();
-		searchScrollOperator = new SearchScrollOperator();
-		clearScrollOperator = new ClearScrollOperator();
-	}
 
 	public Executor getExecutor() {
 		return executor;
@@ -299,6 +288,17 @@ public class ElasticsearchTemplate {
 		clearScroll(response.getScrollId());
 
 		return new PageResult<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		executor = new DefaultExecutor();
+		createIndexOperator = new CreateIndexOperator();
+		bulkOperator = new BulkOperator();
+		operator = new GetOperator();
+		searchOperator = new SearchOperator();
+		searchScrollOperator = new SearchScrollOperator();
+		clearScrollOperator = new ClearScrollOperator();
 	}
 
 }
