@@ -48,10 +48,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.1.8.RELEASE</spring.version>
-		<elasticsearch.version>7.2.0</elasticsearch.version>
+		<spring.version>5.1.9.RELEASE</spring.version>
+		<elasticsearch.version>7.2.1</elasticsearch.version>
 		<jackson-annotation.version>2.10.0.pr1</jackson-annotation.version>
-		<fastjson.version>1.2.58</fastjson.version>
+		<fastjson.version>1.2.59</fastjson.version>
 	</properties>
 
 	<dependencies>
