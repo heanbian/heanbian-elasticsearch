@@ -20,6 +20,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
@@ -28,12 +29,12 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 import com.heanbian.block.reactive.elasticsearch.client.annotation.ElasticsearchId;
-import com.heanbian.block.reactive.elasticsearch.client.executor.DefaultExecutor;
 import com.heanbian.block.reactive.elasticsearch.client.executor.Executor;
-import com.heanbian.block.reactive.elasticsearch.client.operator.HighLevelOperator;
+import com.heanbian.block.reactive.elasticsearch.client.executor.ExecutorImpl;
 import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
 import com.heanbian.block.reactive.elasticsearch.client.page.PageResult;
 
@@ -47,67 +48,58 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
 
-	public Executor getExecutor() {
-		return executor;
-	}
+	@Autowired
+	private RestHighLevelClient client;
 
-	public void setExecutor(Executor executor) {
-		this.executor = executor;
-	}
-
-	public <E, R, S> S exec(Operator<E, R, S> operator, R request) {
+	public <R, S> S exec(Operator<R, S> operator, R request) {
 		return executor.exec(operator, request);
 	}
 
-	public <R, S> S execHighLevel(HighLevelOperator<R, S> operator, R request) {
-		return executor.exec(operator, request);
-	}
-
-	public class CreateIndexOperator extends HighLevelOperator<CreateIndexRequest, CreateIndexResponse> {
+	public class CreateIndexOperator implements Operator<CreateIndexRequest, CreateIndexResponse> {
 
 		@Override
-		public CreateIndexResponse operator(RestHighLevelClient client, CreateIndexRequest request) throws IOException {
-			return client.indices().create(request, getRequestOptions());
+		public CreateIndexResponse operator(CreateIndexRequest request) throws IOException {
+			return client.indices().create(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public class BulkOperator extends HighLevelOperator<BulkRequest, BulkResponse> {
+	public class BulkOperator implements Operator<BulkRequest, BulkResponse> {
 
 		@Override
-		public BulkResponse operator(RestHighLevelClient client, BulkRequest request) throws IOException {
-			return client.bulk(request, getRequestOptions());
+		public BulkResponse operator(BulkRequest request) throws IOException {
+			return client.bulk(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public class GetOperator extends HighLevelOperator<GetRequest, GetResponse> {
+	public class GetOperator implements Operator<GetRequest, GetResponse> {
 
 		@Override
-		public GetResponse operator(RestHighLevelClient client, GetRequest request) throws IOException {
-			return client.get(request, getRequestOptions());
+		public GetResponse operator(GetRequest request) throws IOException {
+			return client.get(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public class SearchOperator extends HighLevelOperator<SearchRequest, SearchResponse> {
+	public class SearchOperator implements Operator<SearchRequest, SearchResponse> {
 
 		@Override
-		public SearchResponse operator(RestHighLevelClient client, SearchRequest request) throws IOException {
-			return client.search(request, getRequestOptions());
+		public SearchResponse operator(SearchRequest request) throws IOException {
+			return client.search(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public class SearchScrollOperator extends HighLevelOperator<SearchScrollRequest, SearchResponse> {
+	public class SearchScrollOperator implements Operator<SearchScrollRequest, SearchResponse> {
 
 		@Override
-		public SearchResponse operator(RestHighLevelClient client, SearchScrollRequest request) throws IOException {
-			return client.scroll(request, getRequestOptions());
+		public SearchResponse operator(SearchScrollRequest request) throws IOException {
+			return client.scroll(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public class ClearScrollOperator extends HighLevelOperator<ClearScrollRequest, ClearScrollResponse> {
+	public class ClearScrollOperator implements Operator<ClearScrollRequest, ClearScrollResponse> {
 
 		@Override
-		public ClearScrollResponse operator(RestHighLevelClient client, ClearScrollRequest request) throws IOException {
-			return client.clearScroll(request, getRequestOptions());
+		public ClearScrollResponse operator(ClearScrollRequest request) throws IOException {
+			return client.clearScroll(request, RequestOptions.DEFAULT);
 		}
 	}
 
@@ -250,7 +242,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (Exception e) {// skip
 		}
 		throw new RuntimeException("No @ElasticsearchId field was found on class");
 	}
@@ -292,7 +284,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		executor = new DefaultExecutor();
+		executor = new ExecutorImpl();
 		createIndexOperator = new CreateIndexOperator();
 		bulkOperator = new BulkOperator();
 		operator = new GetOperator();

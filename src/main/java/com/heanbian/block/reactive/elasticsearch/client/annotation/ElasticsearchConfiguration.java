@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ public class ElasticsearchConfiguration {
 	private String clusterNodes;
 
 	@Bean
-	public RestClientBuilder restClientBuilder() {
+	public RestHighLevelClient restHighLevelClient() {
 		Objects.requireNonNull(clusterNodes, "elasticsearch.cluster-nodes must be set");
 		String[] nodes = clusterNodes.split(",");
 		HttpHost[] hosts = new HttpHost[nodes.length];
@@ -28,7 +28,7 @@ public class ElasticsearchConfiguration {
 				hosts[i] = new HttpHost(s[0], Integer.valueOf(s[1]));
 			}
 		}
-		return RestClient.builder(hosts);
+		return new RestHighLevelClient(RestClient.builder(hosts));
 	}
 
 	@Bean

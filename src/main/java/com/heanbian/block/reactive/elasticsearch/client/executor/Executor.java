@@ -4,6 +4,6 @@ import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
 
 public interface Executor {
 
-	<E, R, S> S exec(Operator<E, R, S> operator, R request);
+	<R, S> S exec(Operator<R, S> operator, R request);
 
 }
