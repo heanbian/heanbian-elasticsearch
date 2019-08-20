@@ -41,12 +41,13 @@ import com.heanbian.block.reactive.elasticsearch.client.page.PageResult;
 public class ElasticsearchTemplate implements InitializingBean {
 
 	private Executor executor;
+	private GetOperator operator;
 	private CreateIndexOperator createIndexOperator;
 	private BulkOperator bulkOperator;
-	private GetOperator operator;
 	private SearchOperator searchOperator;
 	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
+	private IndicesExistsOperator indicesExistsOperator;
 
 	@Autowired
 	private RestHighLevelClient client;
@@ -103,6 +104,20 @@ public class ElasticsearchTemplate implements InitializingBean {
 		}
 	}
 
+	public class IndicesExistsOperator implements Operator<GetRequest, Boolean> {
+
+		@Override
+		public Boolean operator(GetRequest request) throws IOException {
+			return client.exists(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public boolean indicesExists(String index) {
+		Objects.requireNonNull(index, "index must not be empty");
+		GetRequest request = new GetRequest(index);
+		return exec(indicesExistsOperator, request);
+	}
+
 	public CreateIndexResponse createIndex(String index, int shards, int replicas) {
 		return createIndex(index, shards, replicas, null);
 	}
@@ -127,7 +142,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new IndexRequest(index).id(getId(d)).source(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new IndexRequest(index).id(id(d)).source(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -171,7 +186,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, getId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new UpdateRequest(index, id(d)).doc(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -232,19 +247,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(clearScrollOperator, request);
 	}
 
-	private <T> String getId(T source) {
+	private <T> String id(T source) {
+		String id = "";
 		try {
-			for (Field f : source.getClass().getDeclaredFields()) {
+			loop: for (Field f : source.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(ElasticsearchId.class)) {
 					f.setAccessible(true);
 					if (f.get(source) != null) {
-						return f.get(source).toString();
+						id = f.get(source).toString();
+						break loop;
 					}
 				}
 			}
-		} catch (Exception e) {// skip
+		} catch (Exception e) {// Ignore
 		}
-		throw new RuntimeException("No @ElasticsearchId field was found on class");
+		return id;
 	}
 
 	public <T> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder, int pageNumber,
@@ -285,12 +302,13 @@ public class ElasticsearchTemplate implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		executor = new ExecutorImpl();
+		operator = new GetOperator();
 		createIndexOperator = new CreateIndexOperator();
 		bulkOperator = new BulkOperator();
-		operator = new GetOperator();
 		searchOperator = new SearchOperator();
 		searchScrollOperator = new SearchScrollOperator();
 		clearScrollOperator = new ClearScrollOperator();
+		indicesExistsOperator = new IndicesExistsOperator();
 	}
 
 }
