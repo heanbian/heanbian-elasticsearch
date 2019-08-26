@@ -24,6 +24,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
@@ -104,17 +105,17 @@ public class ElasticsearchTemplate implements InitializingBean {
 		}
 	}
 
-	public class IndicesExistsOperator implements Operator<GetRequest, Boolean> {
+	public class IndicesExistsOperator implements Operator<GetIndexRequest, Boolean> {
 
 		@Override
-		public Boolean operator(GetRequest request) throws IOException {
-			return client.exists(request, RequestOptions.DEFAULT);
+		public Boolean operator(GetIndexRequest request) throws IOException {
+			return client.indices().exists(request, RequestOptions.DEFAULT);
 		}
 	}
 
-	public boolean indicesExists(String index) {
-		Objects.requireNonNull(index, "index must not be empty");
-		GetRequest request = new GetRequest(index);
+	public boolean indicesExists(String... indices) {
+		Objects.requireNonNull(indices, "indices must not be null");
+		GetIndexRequest request = new GetIndexRequest(indices);
 		return exec(indicesExistsOperator, request);
 	}
 
