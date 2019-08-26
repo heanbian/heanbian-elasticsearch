@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -20,6 +22,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -49,6 +52,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
 	private IndicesExistsOperator indicesExistsOperator;
+	private AliasesOperator aliasesOperator;
 
 	@Autowired
 	private RestHighLevelClient client;
@@ -111,6 +115,18 @@ public class ElasticsearchTemplate implements InitializingBean {
 		public Boolean operator(GetIndexRequest request) throws IOException {
 			return client.indices().exists(request, RequestOptions.DEFAULT);
 		}
+	}
+
+	public class AliasesOperator implements Operator<GetAliasesRequest, GetAliasesResponse> {
+
+		@Override
+		public GetAliasesResponse operator(GetAliasesRequest request) throws IOException {
+			return client.indices().getAlias(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public Set<String> getAliases() {
+		return exec(aliasesOperator, new GetAliasesRequest()).getAliases().keySet();
 	}
 
 	public boolean indicesExists(String... indices) {
@@ -310,6 +326,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		searchScrollOperator = new SearchScrollOperator();
 		clearScrollOperator = new ClearScrollOperator();
 		indicesExistsOperator = new IndicesExistsOperator();
+		aliasesOperator = new AliasesOperator();
 	}
 
 }
