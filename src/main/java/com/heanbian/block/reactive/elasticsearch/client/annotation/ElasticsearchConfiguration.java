@@ -32,6 +32,8 @@ public class ElasticsearchConfiguration {
 	@Bean
 	public RestHighLevelClient restHighLevelClient() {
 		Objects.requireNonNull(clusterNodes, "elasticsearch.cluster-nodes must be set");
+		Objects.requireNonNull(username, "elasticsearch.username must be set");
+		Objects.requireNonNull(password, "elasticsearch.password must be set");
 
 		String[] nodes = clusterNodes.split(",");
 		HttpHost[] hosts = new HttpHost[nodes.length];
