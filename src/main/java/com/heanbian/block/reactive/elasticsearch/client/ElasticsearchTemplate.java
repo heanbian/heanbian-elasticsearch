@@ -308,6 +308,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 				for (SearchHit hit : hits) {
 					tss.add(JSON.parseObject(hit.getSourceAsString(), clazz));
 				}
+				break loop;
 			}
 			response = searchScroll(response.getScrollId(), keepAlive);
 		}
