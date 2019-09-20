@@ -136,15 +136,23 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public CreateIndexResponse createIndex(String index, int shards, int replicas) {
-		return createIndex(index, shards, replicas, null);
+		return createIndex(index, shards, replicas, null, null);
 	}
 
 	public CreateIndexResponse createIndex(String index, int shards, int replicas, Map<String, ?> mapping) {
+		return createIndex(index, shards, replicas, mapping, null);
+	}
+
+	public CreateIndexResponse createIndex(String index, int shards, int replicas, Map<String, ?> mapping,
+			Map<String, ?> alias) {
 		CreateIndexRequest request = new CreateIndexRequest(index);
 		request.settings(
 				Settings.builder().put("index.number_of_shards", shards).put("index.number_of_replicas", replicas));
 		if (mapping != null) {
 			request.mapping(mapping);
+		}
+		if (alias != null) {
+			request.aliases(alias);
 		}
 		return exec(createIndexOperator, request);
 	}
