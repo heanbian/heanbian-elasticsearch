@@ -13,6 +13,8 @@
 		<artifactId>oss-parent</artifactId>
 		<version>9</version>
 	</parent>
+	
+	<inceptionYear>2019</inceptionYear>
 
 	<licenses>
 		<license>
