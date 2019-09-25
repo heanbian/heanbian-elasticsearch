@@ -305,7 +305,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		searchSourceBuilder.from(0).size(pageSize);// scroll from=0
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
 
-		long total = response.getHits().getTotalHits().value;
+		final long total = response.getHits().getTotalHits().value;
 		List<String> scrollIds = new ArrayList<>();
 		List<T> tss = new ArrayList<>();
 
@@ -320,10 +320,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 				}
 				break loop;
 			}
-			response = searchScroll(response.getScrollId(), keepAlive);
 			scrollIds.add(response.getScrollId());
+			response = searchScroll(response.getScrollId(), keepAlive);
 		}
-		clearScroll(scrollIds);
+		if (scrollIds.size() > 0) {
+			clearScroll(scrollIds);
+		}
 
 		return new PageResult<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
