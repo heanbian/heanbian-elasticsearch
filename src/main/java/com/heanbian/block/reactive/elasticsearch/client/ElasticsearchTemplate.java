@@ -217,7 +217,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String... indices) {
-		return search(searchSourceBuilder, null, indices);
+		return search(searchSourceBuilder, "1m", indices);
 	}
 
 	public <T> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices, Class<T> clazz) {
@@ -225,7 +225,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		Objects.requireNonNull(indices, "indices must not be null");
 		Objects.requireNonNull(clazz, "clazz must not be null");
 
-		SearchResponse response = search(searchSourceBuilder, null, indices);
+		SearchResponse response = search(searchSourceBuilder, "1m", indices);
 		List<T> rs = new ArrayList<>();
 		SearchHit[] hits = response.getHits().getHits();
 		for (SearchHit h : hits) {
@@ -240,9 +240,10 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		SearchRequest request = new SearchRequest(indices);
 		request.source(searchSourceBuilder);
-		if (keepAlive != null) {
-			request.scroll(keepAlive);
+		if (keepAlive == null) {
+			keepAlive = "1m";
 		}
+		request.scroll(keepAlive);
 		return exec(searchOperator, request);
 	}
 
