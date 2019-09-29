@@ -344,4 +344,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 		aliasesOperator = new AliasesOperator();
 	}
 
+//	public static void main(String[] args) {
+//		Map<String, Object> params = new HashMap<>(1);
+//		params.put("paramsFieldName", new String[] { "ABC", "DEF" });
+//		Script script = new Script(ScriptType.INLINE, "painless",
+//				"params.paramsFieldName.containsAll(doc['fieldName.keyword'])", params);
+//		ScriptQueryBuilder scriptQueryBuilder = QueryBuilders.scriptQuery(script);
+//	}
+
 }
