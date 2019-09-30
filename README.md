@@ -37,7 +37,7 @@ import com.heanbian.block.reactive.elasticsearch.client.annotation.EnableElastic
 public class XxxApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(App.class, args);
+		SpringApplication.run(XxxApplication.class, args);
 	}
 }
 
