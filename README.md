@@ -24,7 +24,7 @@ elasticsearch:
   
 ```
 
-### Spring boot 2.x 项目启动类 XxxApplication 上注解 `@EnableElasticsearch` 样例:
+### 在 Spring boot 2.x 项目启动类 XxxApplication 上加注解 `@EnableElasticsearch` 样例:
 
 ```java
 
