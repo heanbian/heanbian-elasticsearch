@@ -50,7 +50,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.2.0.RELEASE</spring.version>
+		<spring-framework.version>5.2.0.RELEASE</spring-framework.version>
 		<elasticsearch.version>7.4.1</elasticsearch.version>
 		<jackson-annotation.version>2.10.0</jackson-annotation.version>
 		<fastjson.version>1.2.62</fastjson.version>
@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-framework.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
