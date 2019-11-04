@@ -51,7 +51,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.2.0.RELEASE</spring-framework.version>
-		<elasticsearch.version>7.4.1</elasticsearch.version>
+		<elasticsearch.version>7.4.2</elasticsearch.version>
 		<jackson-annotation.version>2.10.0</jackson-annotation.version>
 		<fastjson.version>1.2.62</fastjson.version>
 	</properties>
