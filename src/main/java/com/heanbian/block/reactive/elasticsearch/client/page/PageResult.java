@@ -6,28 +6,22 @@ import java.util.List;
 import org.elasticsearch.search.SearchHit;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class PageResult<I> {
 
 	/**
 	 * 当前页号
 	 */
-	@JsonProperty("page_number")
 	private int pageNumber;
 
 	/**
 	 * 页大小
 	 */
-	@JsonProperty("page_size")
 	private int pageSize;
 
 	/**
 	 * 总页数
 	 */
-	@JsonProperty("total_page")
 	private long totalPage;
 
 	/**
@@ -40,7 +34,8 @@ public class PageResult<I> {
 	 */
 	private List<I> list;
 
-	public PageResult() {}
+	public PageResult() {
+	}
 
 	public int getPageNumber() {
 		return pageNumber;
@@ -71,7 +66,8 @@ public class PageResult<I> {
 
 	// 总页数 = （总记录数 + 每页数据大小 - 1） / 每页数据大小
 	public long getTotalPage() {
-		return (total + pageSize - 1) / pageSize;
+		this.totalPage = (total + pageSize - 1) / pageSize;
+		return totalPage;
 	}
 
 	public List<I> getList() {
