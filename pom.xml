@@ -5,7 +5,7 @@
 
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.0.13</version>
+	<version>11.0.14</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -51,7 +51,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.2.2.RELEASE</spring-framework.version>
-		<elasticsearch.version>7.5.0</elasticsearch.version>
+		<elasticsearch.version>7.5.1</elasticsearch.version>
 		<fastjson.version>1.2.62</fastjson.version>
 	</properties>
 
