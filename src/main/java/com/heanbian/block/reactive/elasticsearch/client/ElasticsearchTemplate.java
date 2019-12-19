@@ -165,7 +165,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new IndexRequest(index).id(id(d)).source(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new IndexRequest(index).id(eId(d)).source(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -209,7 +209,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, id(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+			request.add(new UpdateRequest(index, eId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
 	}
@@ -272,7 +272,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(clearScrollOperator, request);
 	}
 
-	private <T extends ElasticsearchId> String id(T source) {
+	private <T extends ElasticsearchId> String eId(T source) {
 		return Objects.requireNonNull(source.getEId(), "eId must not be null");
 	}
 
