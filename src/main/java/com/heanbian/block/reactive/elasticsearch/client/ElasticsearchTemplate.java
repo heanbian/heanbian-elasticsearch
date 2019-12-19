@@ -1,7 +1,6 @@
 package com.heanbian.block.reactive.elasticsearch.client;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +35,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
-import com.heanbian.block.reactive.elasticsearch.client.annotation.ElasticsearchId;
 import com.heanbian.block.reactive.elasticsearch.client.executor.Executor;
 import com.heanbian.block.reactive.elasticsearch.client.executor.ExecutorImpl;
 import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
@@ -157,11 +155,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(createIndexOperator, request);
 	}
 
-	public <T> BulkResponse bulkInsert(String index, T source) {
+	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, T source) {
 		return bulkInsert(index, Arrays.asList(source));
 	}
 
-	public <T> BulkResponse bulkInsert(String index, List<T> sources) {
+	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, List<T> sources) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(sources, "sources must not be null");
 
@@ -194,18 +192,18 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(operator, new GetRequest(index, id));
 	}
 
-	public <T> T findById(String index, String id, Class<T> clazz) {
+	public <T extends ElasticsearchId> T findById(String index, String id, Class<T> clazz) {
 		Objects.requireNonNull(clazz, "clazz must not be null");
 
 		GetResponse response = findById(index, id);
 		return JSON.parseObject(response.getSourceAsString(), clazz);
 	}
 
-	public <T> BulkResponse bulkUpdate(String index, T source) {
+	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, T source) {
 		return bulkUpdate(index, Arrays.asList(source));
 	}
 
-	public <T> BulkResponse bulkUpdate(String index, List<T> sources) {
+	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, List<T> sources) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(sources, "sources must not be null");
 
@@ -220,7 +218,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return search(searchSourceBuilder, "1m", indices);
 	}
 
-	public <T> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices, Class<T> clazz) {
+	public <T extends ElasticsearchId> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices,
+			Class<T> clazz) {
 		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
 		Objects.requireNonNull(indices, "indices must not be null");
 		Objects.requireNonNull(clazz, "clazz must not be null");
@@ -273,31 +272,18 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(clearScrollOperator, request);
 	}
 
-	private <T> String id(T source) {
-		String id = "";
-		try {
-			loop: for (Field f : source.getClass().getDeclaredFields()) {
-				if (f.isAnnotationPresent(ElasticsearchId.class)) {
-					f.setAccessible(true);
-					if (f.get(source) != null) {
-						id = f.get(source).toString();
-						break loop;
-					}
-				}
-			}
-		} catch (Exception e) {// Ignore
-		}
-		return id;
+	private <T extends ElasticsearchId> String id(T source) {
+		return Objects.requireNonNull(source.getEId(), "eId must not be null");
 	}
 
-	public <T> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder, int pageNumber,
-			int pageSize, String index, String keepAlive, Class<T> clazz) {
+	public <T extends ElasticsearchId> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			int pageNumber, int pageSize, String index, String keepAlive, Class<T> clazz) {
 		return searchScrollDeepPaging(searchSourceBuilder, pageNumber, pageSize, new String[] { index }, keepAlive,
 				clazz);
 	}
 
-	public <T> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder, final int pageNumber,
-			final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
+	public <T extends ElasticsearchId> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			final int pageNumber, final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
 
 		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
 		Objects.requireNonNull(indices, "indices must not be null");
@@ -331,8 +317,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return new PageResult<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void init() {
 		executor = new ExecutorImpl();
 		operator = new GetOperator();
 		createIndexOperator = new CreateIndexOperator();
@@ -342,6 +327,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		clearScrollOperator = new ClearScrollOperator();
 		indicesExistsOperator = new IndicesExistsOperator();
 		aliasesOperator = new AliasesOperator();
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
 	}
 
 //	public static void main(String[] args) {
