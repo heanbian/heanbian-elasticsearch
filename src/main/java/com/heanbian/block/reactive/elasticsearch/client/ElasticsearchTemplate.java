@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -21,6 +22,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.Cancellable;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -46,6 +48,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private GetOperator operator;
 	private CreateIndexOperator createIndexOperator;
 	private BulkOperator bulkOperator;
+	private BulkAsyncOperator bulkAsyncOperator;
 	private SearchOperator searchOperator;
 	private SearchScrollOperator searchScrollOperator;
 	private ClearScrollOperator clearScrollOperator;
@@ -72,6 +75,24 @@ public class ElasticsearchTemplate implements InitializingBean {
 		@Override
 		public BulkResponse operator(BulkRequest request) throws IOException {
 			return client.bulk(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public class BulkAsyncOperator implements Operator<BulkRequest, Cancellable> {
+
+		@Override
+		public Cancellable operator(BulkRequest request) throws IOException {
+			return client.bulkAsync(request, RequestOptions.DEFAULT, new ActionListener<BulkResponse>() {
+
+				@Override
+				public void onResponse(BulkResponse response) {
+				}
+
+				@Override
+				public void onFailure(Exception e) {
+					// e.printStackTrace();
+				}
+			});
 		}
 	}
 
@@ -170,6 +191,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(bulkOperator, request);
 	}
 
+	public <T extends ElasticsearchId> Cancellable bulkAsyncInsert(String index, T source) {
+		return bulkAsyncInsert(index, Arrays.asList(source));
+	}
+
+	public <T extends ElasticsearchId> Cancellable bulkAsyncInsert(String index, List<T> sources) {
+		Objects.requireNonNull(index, "index must not be null");
+		Objects.requireNonNull(sources, "sources must not be null");
+
+		BulkRequest request = new BulkRequest();
+		sources.forEach(d -> {
+			request.add(new IndexRequest(index).id(eId(d)).source(JSON.toJSONString(d), XContentType.JSON));
+		});
+		return exec(bulkAsyncOperator, request);
+	}
+
 	public BulkResponse bulkDelete(String index, String... ids) {
 		return bulkDelete(index, Arrays.asList(ids));
 	}
@@ -183,6 +219,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 			request.add(new DeleteRequest(index, id));
 		});
 		return exec(bulkOperator, request);
+	}
+
+	public Cancellable bulkAsyncDelete(String index, String... ids) {
+		return bulkAsyncDelete(index, Arrays.asList(ids));
+	}
+
+	public Cancellable bulkAsyncDelete(String index, List<String> ids) {
+		Objects.requireNonNull(index, "index must not be null");
+		Objects.requireNonNull(ids, "ids must not be null");
+
+		BulkRequest request = new BulkRequest();
+		ids.forEach(id -> {
+			request.add(new DeleteRequest(index, id));
+		});
+		return exec(bulkAsyncOperator, request);
 	}
 
 	public GetResponse findById(String index, String id) {
@@ -212,6 +263,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 			request.add(new UpdateRequest(index, eId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
 		});
 		return exec(bulkOperator, request);
+	}
+
+	public <T extends ElasticsearchId> Cancellable bulkAsyncUpdate(String index, T source) {
+		return bulkAsyncUpdate(index, Arrays.asList(source));
+	}
+
+	public <T extends ElasticsearchId> Cancellable bulkAsyncUpdate(String index, List<T> sources) {
+		Objects.requireNonNull(index, "index must not be null");
+		Objects.requireNonNull(sources, "sources must not be null");
+
+		BulkRequest request = new BulkRequest();
+		sources.forEach(d -> {
+			request.add(new UpdateRequest(index, eId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+		});
+		return exec(bulkAsyncOperator, request);
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String... indices) {
@@ -322,6 +388,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		operator = new GetOperator();
 		createIndexOperator = new CreateIndexOperator();
 		bulkOperator = new BulkOperator();
+		bulkAsyncOperator = new BulkAsyncOperator();
 		searchOperator = new SearchOperator();
 		searchScrollOperator = new SearchScrollOperator();
 		clearScrollOperator = new ClearScrollOperator();
@@ -333,13 +400,5 @@ public class ElasticsearchTemplate implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		init();
 	}
-
-//	public static void main(String[] args) {
-//		Map<String, Object> params = new HashMap<>(1);
-//		params.put("paramsFieldName", new String[] { "ABC", "DEF" });
-//		Script script = new Script(ScriptType.INLINE, "painless",
-//				"params.paramsFieldName.containsAll(doc['fieldName.keyword'])", params);
-//		ScriptQueryBuilder scriptQueryBuilder = QueryBuilders.scriptQuery(script);
-//	}
 
 }

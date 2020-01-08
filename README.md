@@ -7,7 +7,7 @@
 <dependency>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.0.12</version>
+	<version>11.0.15</version>
 </dependency>
 
 ```
@@ -59,4 +59,10 @@ public class XxxElasticsearch {
 	//TODO
 }
 
+```
+
+source 数据类必须实现接口 `ElasticsearchId`
+
+```
+<T extends ElasticsearchId> source
 ```
