@@ -17,10 +17,7 @@
 
 ```yaml
 
-elasticsearch:
-  cluster-nodes: IP1:port,IP2:port ...
-  username: username
-  password: password
+elasticsearch.cluster-nodes: elasticsearch://<username>:<password>@<ip>:<port>,<ip>:<port>...
   
 ```
 

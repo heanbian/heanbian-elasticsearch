@@ -1,5 +1,6 @@
 package com.heanbian.block.reactive.elasticsearch.client.annotation;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.http.HttpHost;
@@ -15,37 +16,34 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.heanbian.block.reactive.elasticsearch.client.ConnectionString;
 import com.heanbian.block.reactive.elasticsearch.client.ElasticsearchTemplate;
 
 @Configuration
 public class ElasticsearchConfiguration {
 
 	@Value("${elasticsearch.cluster-nodes:}")
-	private String clusterNodes;
-
-	@Value("${elasticsearch.username:}")
-	private String username;
-
-	@Value("${elasticsearch.password:}")
-	private String password;
+	private String connectionString;
 
 	@Bean
 	public RestHighLevelClient restHighLevelClient() {
-		Objects.requireNonNull(clusterNodes, "elasticsearch.cluster-nodes must be set");
-		Objects.requireNonNull(username, "elasticsearch.username must be set");
-		Objects.requireNonNull(password, "elasticsearch.password must be set");
+		Objects.requireNonNull(connectionString, "elasticsearch.cluster-nodes is required");
 
-		String[] nodes = clusterNodes.split(",");
-		HttpHost[] hosts = new HttpHost[nodes.length];
-		for (int i = 0; i < nodes.length; i++) {
-			String[] s = nodes[i].split(":");
+		ConnectionString conn = new ConnectionString(connectionString);
+		List<String> nodes = conn.getHosts();
+		final int size = nodes.size();
+		HttpHost[] hosts = new HttpHost[size];
+
+		for (int i = 0; i < size; i++) {
+			String[] s = nodes.get(i).split(":");
 			if (s.length == 2) {
 				hosts[i] = new HttpHost(s[0], Integer.valueOf(s[1]));
 			}
 		}
 
 		final CredentialsProvider credentials = new BasicCredentialsProvider();
-		credentials.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+		credentials.setCredentials(AuthScope.ANY,
+				new UsernamePasswordCredentials(conn.getUsername(), conn.getPassword()));
 
 		return new RestHighLevelClient(
 				RestClient.builder(hosts).setHttpClientConfigCallback(new HttpClientConfigCallback() {
