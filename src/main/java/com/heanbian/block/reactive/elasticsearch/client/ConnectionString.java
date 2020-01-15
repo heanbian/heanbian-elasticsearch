@@ -29,11 +29,10 @@ public class ConnectionString {
 
 		String unprocessedConnectionString = connectionString.substring(ELASTICSEARCH_PREFIX.length());
 
-		String userInfo;
 		String hostIdentifier;
 		int idx = unprocessedConnectionString.lastIndexOf("@");
 		if (idx > 0) {
-			userInfo = unprocessedConnectionString.substring(0, idx).replace("+", "%2B");
+			String userInfo = unprocessedConnectionString.substring(0, idx).replace("+", "%2B");
 			hostIdentifier = unprocessedConnectionString.substring(idx + 1);
 			int colonCount = countOccurrences(userInfo, ":");
 			if (userInfo.contains("@") || colonCount > 1) {
