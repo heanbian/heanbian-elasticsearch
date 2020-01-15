@@ -7,7 +7,7 @@
 <dependency>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.0.15</version>
+	<version>11.0.17</version>
 </dependency>
 
 ```
