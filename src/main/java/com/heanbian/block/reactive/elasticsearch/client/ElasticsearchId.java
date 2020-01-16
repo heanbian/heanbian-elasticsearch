@@ -8,6 +8,6 @@ package com.heanbian.block.reactive.elasticsearch.client;
 @FunctionalInterface
 public interface ElasticsearchId {
 
-	String getEId();
+	String getElasticsearchId();
 
 }

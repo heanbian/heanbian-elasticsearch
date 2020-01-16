@@ -339,7 +339,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	private <T extends ElasticsearchId> String eId(T source) {
-		return Objects.requireNonNull(source.getEId(), "eId must not be null");
+		return Objects.requireNonNull(source.getElasticsearchId(), "ElasticsearchId must not be null");
 	}
 
 	public <T extends ElasticsearchId> PageResult<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
