@@ -5,7 +5,7 @@
 
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.1.1</version>
+	<version>11.1.2</version>
 	<packaging>jar</packaging>
 
 	<name>heanbian-elasticsearch-client</name>
@@ -169,19 +169,16 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-high-level-client</artifactId>
 			<version>${elasticsearch.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>${fastjson.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

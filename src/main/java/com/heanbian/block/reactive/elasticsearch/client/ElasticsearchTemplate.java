@@ -191,11 +191,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(bulkOperator, request);
 	}
 
-	public <T extends ElasticsearchId> Cancellable bulkAsyncInsert(String index, T source) {
-		return bulkAsyncInsert(index, Arrays.asList(source));
+	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, T source) {
+		return bulkInsertAsync(index, Arrays.asList(source));
 	}
 
-	public <T extends ElasticsearchId> Cancellable bulkAsyncInsert(String index, List<T> sources) {
+	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, List<T> sources) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(sources, "sources must not be null");
 
@@ -221,11 +221,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(bulkOperator, request);
 	}
 
-	public Cancellable bulkAsyncDelete(String index, String... ids) {
-		return bulkAsyncDelete(index, Arrays.asList(ids));
+	public Cancellable bulkDeleteAsync(String index, String... ids) {
+		return bulkDeleteAsync(index, Arrays.asList(ids));
 	}
 
-	public Cancellable bulkAsyncDelete(String index, List<String> ids) {
+	public Cancellable bulkDeleteAsync(String index, List<String> ids) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(ids, "ids must not be null");
 
@@ -265,11 +265,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(bulkOperator, request);
 	}
 
-	public <T extends ElasticsearchId> Cancellable bulkAsyncUpdate(String index, T source) {
-		return bulkAsyncUpdate(index, Arrays.asList(source));
+	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, T source) {
+		return bulkUpdateAsync(index, Arrays.asList(source));
 	}
 
-	public <T extends ElasticsearchId> Cancellable bulkAsyncUpdate(String index, List<T> sources) {
+	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, List<T> sources) {
 		Objects.requireNonNull(index, "index must not be null");
 		Objects.requireNonNull(sources, "sources must not be null");
 
