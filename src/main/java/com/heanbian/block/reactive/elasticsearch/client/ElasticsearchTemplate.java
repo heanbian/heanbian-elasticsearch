@@ -30,7 +30,12 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,12 +59,30 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private ClearScrollOperator clearScrollOperator;
 	private IndicesExistsOperator indicesExistsOperator;
 	private AliasesOperator aliasesOperator;
+	private DeleteByQueryRequestOperator deleteByQueryRequestOperator;
+	private UpdateByQueryRequestOperator updateByQueryRequestOperator;
 
 	@Autowired
 	private RestHighLevelClient client;
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
 		return executor.exec(operator, request);
+	}
+
+	public class DeleteByQueryRequestOperator implements Operator<DeleteByQueryRequest, BulkByScrollResponse> {
+
+		@Override
+		public BulkByScrollResponse operator(DeleteByQueryRequest request) throws IOException {
+			return client.deleteByQuery(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public class UpdateByQueryRequestOperator implements Operator<UpdateByQueryRequest, BulkByScrollResponse> {
+
+		@Override
+		public BulkByScrollResponse operator(UpdateByQueryRequest request) throws IOException {
+			return client.updateByQuery(request, RequestOptions.DEFAULT);
+		}
 	}
 
 	public class CreateIndexOperator implements Operator<CreateIndexRequest, CreateIndexResponse> {
@@ -90,7 +113,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 				@Override
 				public void onFailure(Exception e) {
-					// e.printStackTrace();
 				}
 			});
 		}
@@ -383,6 +405,30 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return new PageResult<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
 
+	public BulkByScrollResponse deleteByQuery(QueryBuilder query, String... indices) {
+		DeleteByQueryRequest request = new DeleteByQueryRequest(indices);
+		request.setConflicts("proceed");
+		request.setQuery(query);
+		request.setBatchSize(1000);
+		request.setSlices(2);
+		request.setScroll(TimeValue.timeValueMinutes(10));
+		request.setTimeout(TimeValue.timeValueMinutes(2));
+		request.setRefresh(true);
+		return exec(deleteByQueryRequestOperator, request);
+	}
+
+	public BulkByScrollResponse updateByQuery(QueryBuilder query, String... indices) {
+		UpdateByQueryRequest request = new UpdateByQueryRequest(indices);
+		request.setConflicts("proceed");
+		request.setQuery(query);
+		request.setBatchSize(1000);
+		request.setSlices(2);
+		request.setScroll(TimeValue.timeValueMinutes(10));
+		request.setTimeout(TimeValue.timeValueMinutes(2));
+		request.setRefresh(true);
+		return exec(updateByQueryRequestOperator, request);
+	}
+
 	public void init() {
 		executor = new ExecutorImpl();
 		operator = new GetOperator();
@@ -394,6 +440,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 		clearScrollOperator = new ClearScrollOperator();
 		indicesExistsOperator = new IndicesExistsOperator();
 		aliasesOperator = new AliasesOperator();
+		deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
+		updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
 	}
 
 	@Override
