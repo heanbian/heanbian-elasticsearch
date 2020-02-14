@@ -414,6 +414,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		request.setScroll(TimeValue.timeValueMinutes(10));
 		request.setTimeout(TimeValue.timeValueMinutes(2));
 		request.setRefresh(true);
+		return deleteByQuery(request);
+	}
+
+	public BulkByScrollResponse deleteByQuery(DeleteByQueryRequest request) {
+		Objects.requireNonNull(request, "DeleteByQueryRequest must not be null");
 		return exec(deleteByQueryRequestOperator, request);
 	}
 
@@ -426,6 +431,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		request.setScroll(TimeValue.timeValueMinutes(10));
 		request.setTimeout(TimeValue.timeValueMinutes(2));
 		request.setRefresh(true);
+		return updateByQuery(request);
+	}
+
+	public BulkByScrollResponse updateByQuery(UpdateByQueryRequest request) {
+		Objects.requireNonNull(request, "UpdateByQueryRequest must not be null");
 		return exec(updateByQueryRequestOperator, request);
 	}
 

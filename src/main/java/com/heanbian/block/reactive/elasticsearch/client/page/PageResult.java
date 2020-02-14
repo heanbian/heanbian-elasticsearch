@@ -12,12 +12,12 @@ public class PageResult<I> {
 	/**
 	 * 当前页号
 	 */
-	private int pageNumber;
+	private int pageNumber = 1;
 
 	/**
 	 * 页大小
 	 */
-	private int pageSize;
+	private int pageSize = 10;
 
 	/**
 	 * 总页数
