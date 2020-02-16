@@ -1,10 +1,10 @@
-package com.heanbian.block.reactive.elasticsearch.client.executor;
+package com.heanbian.block.elasticsearch.client.executor;
 
 import java.io.IOException;
 
-import com.heanbian.block.reactive.elasticsearch.client.operator.Operator;
+import com.heanbian.block.elasticsearch.client.operator.Operator;
 
-public class ExecutorImpl implements Executor {
+public class DefaultExecutorImpl implements Executor {
 
 	@Override
 	public <R, S> S exec(Operator<R, S> operator, R request) {

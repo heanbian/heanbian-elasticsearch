@@ -1,4 +1,4 @@
-package com.heanbian.block.reactive.elasticsearch.client;
+package com.heanbian.block.elasticsearch.client;
 
 /**
  * 

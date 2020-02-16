@@ -1,4 +1,4 @@
-package com.heanbian.block.reactive.elasticsearch.client;
+package com.heanbian.block.elasticsearch.client;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

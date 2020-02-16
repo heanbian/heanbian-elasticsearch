@@ -1,4 +1,4 @@
-package com.heanbian.block.reactive.elasticsearch.client.annotation;
+package com.heanbian.block.elasticsearch.client.annotation;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.heanbian.block.reactive.elasticsearch.client.ConnectionString;
-import com.heanbian.block.reactive.elasticsearch.client.ElasticsearchTemplate;
+import com.heanbian.block.elasticsearch.client.ConnectionString;
+import com.heanbian.block.elasticsearch.client.ElasticsearchTemplate;
 
 @Configuration
 public class ElasticsearchConfiguration {
