@@ -26,6 +26,8 @@ import org.elasticsearch.client.Cancellable;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -61,12 +63,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private AliasesOperator aliasesOperator;
 	private DeleteByQueryRequestOperator deleteByQueryRequestOperator;
 	private UpdateByQueryRequestOperator updateByQueryRequestOperator;
+	private CountRequestOperator countRequestOperator;
 
 	@Autowired
 	private RestHighLevelClient client;
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
 		return executor.exec(operator, request);
+	}
+
+	public class CountRequestOperator implements Operator<CountRequest, CountResponse> {
+
+		@Override
+		public CountResponse operator(CountRequest request) throws IOException {
+			return client.count(request, RequestOptions.DEFAULT);
+		}
 	}
 
 	public class DeleteByQueryRequestOperator implements Operator<DeleteByQueryRequest, BulkByScrollResponse> {
@@ -439,6 +450,15 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(updateByQueryRequestOperator, request);
 	}
 
+	public CountResponse count(QueryBuilder query, String... indices) {
+		return count(new CountRequest(indices, query));
+	}
+
+	public CountResponse count(CountRequest request) {
+		Objects.requireNonNull(request, "CountRequest must not be null");
+		return exec(countRequestOperator, request);
+	}
+
 	public void init() {
 		executor = new DefaultExecutorImpl();
 		operator = new GetOperator();
@@ -452,6 +472,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		aliasesOperator = new AliasesOperator();
 		deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
 		updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
+		countRequestOperator = new CountRequestOperator();
 	}
 
 	@Override
