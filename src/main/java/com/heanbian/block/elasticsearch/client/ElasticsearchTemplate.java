@@ -459,6 +459,10 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(countRequestOperator, request);
 	}
 
+	public RestHighLevelClient getRestHighLevelClient() {
+		return client;
+	}
+
 	public void init() {
 		executor = new DefaultExecutorImpl();
 		operator = new GetOperator();
