@@ -56,7 +56,7 @@ public class ElasticsearchConfiguration {
 
 	@Bean
 	public ElasticsearchTemplate elasticsearchTemplate() {
-		return new ElasticsearchTemplate();
+		return new ElasticsearchTemplate(restHighLevelClient());
 	}
 
 }

@@ -10,9 +10,12 @@ import java.util.Set;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.explain.ExplainRequest;
+import org.elasticsearch.action.explain.ExplainResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -21,7 +24,9 @@ import org.elasticsearch.action.search.ClearScrollResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Cancellable;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -30,6 +35,7 @@ import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
@@ -41,7 +47,6 @@ import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 import com.heanbian.block.elasticsearch.client.executor.DefaultExecutorImpl;
@@ -49,24 +54,37 @@ import com.heanbian.block.elasticsearch.client.executor.Executor;
 import com.heanbian.block.elasticsearch.client.operator.Operator;
 import com.heanbian.block.elasticsearch.client.page.Page;
 
+/**
+ * 
+ * @author heanbian
+ *
+ */
 public class ElasticsearchTemplate implements InitializingBean {
 
-	private Executor executor;
-	private GetOperator operator;
-	private CreateIndexOperator createIndexOperator;
-	private BulkOperator bulkOperator;
-	private BulkAsyncOperator bulkAsyncOperator;
-	private SearchOperator searchOperator;
-	private SearchScrollOperator searchScrollOperator;
-	private ClearScrollOperator clearScrollOperator;
-	private IndicesExistsOperator indicesExistsOperator;
-	private AliasesOperator aliasesOperator;
-	private DeleteByQueryRequestOperator deleteByQueryRequestOperator;
-	private UpdateByQueryRequestOperator updateByQueryRequestOperator;
-	private CountRequestOperator countRequestOperator;
+	private AliasesOperator aliasesOperator = new AliasesOperator();
+	private BulkOperator bulkOperator = new BulkOperator();
+	private BulkAsyncOperator bulkAsyncOperator = new BulkAsyncOperator();
+	private CreateIndexOperator createIndexOperator = new CreateIndexOperator();
+	private ClearScrollOperator clearScrollOperator = new ClearScrollOperator();
+	private CountRequestOperator countRequestOperator = new CountRequestOperator();
+	private DeleteIndexOperator deleteIndexOperator = new DeleteIndexOperator();
+	private DeleteByQueryRequestOperator deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
+	private DeleteAliasOperator deleteAliasOperator = new DeleteAliasOperator();
+	private Executor executor = new DefaultExecutorImpl();
+	private ExplainOperator explainOperator = new ExplainOperator();
+	private ExistsRequestOperator existsRequestOperator = new ExistsRequestOperator();
+	private GetOperator operator = new GetOperator();
+	private IndicesExistsOperator indicesExistsOperator = new IndicesExistsOperator();
+	private SearchOperator searchOperator = new SearchOperator();
+	private SearchScrollOperator searchScrollOperator = new SearchScrollOperator();
+	private UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
+	private UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
 
-	@Autowired
 	private RestHighLevelClient client;
+
+	public ElasticsearchTemplate(RestHighLevelClient client) {
+		this.client = client;
+	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
 		return executor.exec(operator, request);
@@ -77,6 +95,22 @@ public class ElasticsearchTemplate implements InitializingBean {
 		@Override
 		public CountResponse operator(CountRequest request) throws IOException {
 			return client.count(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public class UpdateRequestOperator implements Operator<UpdateRequest, UpdateResponse> {
+
+		@Override
+		public UpdateResponse operator(UpdateRequest request) throws IOException {
+			return client.update(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public class ExistsRequestOperator implements Operator<GetRequest, Boolean> {
+
+		@Override
+		public Boolean operator(GetRequest request) throws IOException {
+			return client.exists(request, RequestOptions.DEFAULT);
 		}
 	}
 
@@ -104,6 +138,24 @@ public class ElasticsearchTemplate implements InitializingBean {
 		}
 	}
 
+	public class DeleteIndexOperator implements Operator<DeleteIndexRequest, AcknowledgedResponse> {
+
+		@Override
+		public AcknowledgedResponse operator(DeleteIndexRequest request) throws IOException {
+			return client.indices().delete(request, RequestOptions.DEFAULT);
+		}
+	}
+
+	public class DeleteAliasOperator
+			implements Operator<DeleteAliasRequest, org.elasticsearch.client.core.AcknowledgedResponse> {
+
+		@Override
+		public org.elasticsearch.client.core.AcknowledgedResponse operator(DeleteAliasRequest request)
+				throws IOException {
+			return client.indices().deleteAlias(request, RequestOptions.DEFAULT);
+		}
+	}
+
 	public class BulkOperator implements Operator<BulkRequest, BulkResponse> {
 
 		@Override
@@ -126,6 +178,14 @@ public class ElasticsearchTemplate implements InitializingBean {
 				public void onFailure(Exception e) {
 				}
 			});
+		}
+	}
+
+	public class ExplainOperator implements Operator<ExplainRequest, ExplainResponse> {
+
+		@Override
+		public ExplainResponse operator(ExplainRequest request) throws IOException {
+			return client.explain(request, RequestOptions.DEFAULT);
 		}
 	}
 
@@ -429,7 +489,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkByScrollResponse deleteByQuery(DeleteByQueryRequest request) {
-		Objects.requireNonNull(request, "DeleteByQueryRequest must not be null");
+		Objects.requireNonNull(request, "request must not be null");
 		return exec(deleteByQueryRequestOperator, request);
 	}
 
@@ -446,7 +506,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkByScrollResponse updateByQuery(UpdateByQueryRequest request) {
-		Objects.requireNonNull(request, "UpdateByQueryRequest must not be null");
+		Objects.requireNonNull(request, "request must not be null");
 		return exec(updateByQueryRequestOperator, request);
 	}
 
@@ -455,33 +515,49 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public CountResponse count(CountRequest request) {
-		Objects.requireNonNull(request, "CountRequest must not be null");
+		Objects.requireNonNull(request, "request must not be null");
 		return exec(countRequestOperator, request);
 	}
 
-	public RestHighLevelClient getRestHighLevelClient() {
+	public RestHighLevelClient client() {
 		return client;
 	}
 
-	public void init() {
-		executor = new DefaultExecutorImpl();
-		operator = new GetOperator();
-		createIndexOperator = new CreateIndexOperator();
-		bulkOperator = new BulkOperator();
-		bulkAsyncOperator = new BulkAsyncOperator();
-		searchOperator = new SearchOperator();
-		searchScrollOperator = new SearchScrollOperator();
-		clearScrollOperator = new ClearScrollOperator();
-		indicesExistsOperator = new IndicesExistsOperator();
-		aliasesOperator = new AliasesOperator();
-		deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
-		updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
-		countRequestOperator = new CountRequestOperator();
+	public AcknowledgedResponse deleteIndex(String... indices) {
+		return deleteIndex(new DeleteIndexRequest(indices));
+	}
+
+	public AcknowledgedResponse deleteIndex(DeleteIndexRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return exec(deleteIndexOperator, request);
+	}
+
+	public ExplainResponse explain(ExplainRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return exec(explainOperator, request);
+	}
+
+	public org.elasticsearch.client.core.AcknowledgedResponse deleteAlias(DeleteAliasRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return exec(deleteAliasOperator, request);
+	}
+
+	public boolean exists(String index, String id) {
+		return exists(new GetRequest(index, id));
+	}
+
+	public boolean exists(GetRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return exec(existsRequestOperator, request);
+	}
+
+	public UpdateResponse update(UpdateRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return exec(updateRequestOperator, request);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		init();
+		Objects.requireNonNull(client, "client must not be null");
 	}
-
 }
