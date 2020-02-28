@@ -1,11 +1,13 @@
 package com.heanbian.block.elasticsearch.client;
 
+import static java.util.Objects.requireNonNull;
+import static org.elasticsearch.client.RequestOptions.DEFAULT;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.elasticsearch.action.ActionListener;
@@ -29,7 +31,6 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Cancellable;
 import org.elasticsearch.client.GetAliasesResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
@@ -94,7 +95,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public CountResponse operator(CountRequest request) throws IOException {
-			return client.count(request, RequestOptions.DEFAULT);
+			return client.count(request, DEFAULT);
 		}
 	}
 
@@ -102,7 +103,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public UpdateResponse operator(UpdateRequest request) throws IOException {
-			return client.update(request, RequestOptions.DEFAULT);
+			return client.update(request, DEFAULT);
 		}
 	}
 
@@ -110,7 +111,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public Boolean operator(GetRequest request) throws IOException {
-			return client.exists(request, RequestOptions.DEFAULT);
+			return client.exists(request, DEFAULT);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public BulkByScrollResponse operator(DeleteByQueryRequest request) throws IOException {
-			return client.deleteByQuery(request, RequestOptions.DEFAULT);
+			return client.deleteByQuery(request, DEFAULT);
 		}
 	}
 
@@ -126,7 +127,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public BulkByScrollResponse operator(UpdateByQueryRequest request) throws IOException {
-			return client.updateByQuery(request, RequestOptions.DEFAULT);
+			return client.updateByQuery(request, DEFAULT);
 		}
 	}
 
@@ -134,7 +135,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public CreateIndexResponse operator(CreateIndexRequest request) throws IOException {
-			return client.indices().create(request, RequestOptions.DEFAULT);
+			return client.indices().create(request, DEFAULT);
 		}
 	}
 
@@ -142,7 +143,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public AcknowledgedResponse operator(DeleteIndexRequest request) throws IOException {
-			return client.indices().delete(request, RequestOptions.DEFAULT);
+			return client.indices().delete(request, DEFAULT);
 		}
 	}
 
@@ -152,7 +153,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 		@Override
 		public org.elasticsearch.client.core.AcknowledgedResponse operator(DeleteAliasRequest request)
 				throws IOException {
-			return client.indices().deleteAlias(request, RequestOptions.DEFAULT);
+			return client.indices().deleteAlias(request, DEFAULT);
 		}
 	}
 
@@ -160,7 +161,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public BulkResponse operator(BulkRequest request) throws IOException {
-			return client.bulk(request, RequestOptions.DEFAULT);
+			return client.bulk(request, DEFAULT);
 		}
 	}
 
@@ -168,7 +169,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public Cancellable operator(BulkRequest request) throws IOException {
-			return client.bulkAsync(request, RequestOptions.DEFAULT, new ActionListener<BulkResponse>() {
+			return client.bulkAsync(request, DEFAULT, new ActionListener<BulkResponse>() {
 
 				@Override
 				public void onResponse(BulkResponse response) {
@@ -185,7 +186,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public ExplainResponse operator(ExplainRequest request) throws IOException {
-			return client.explain(request, RequestOptions.DEFAULT);
+			return client.explain(request, DEFAULT);
 		}
 	}
 
@@ -193,7 +194,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public GetResponse operator(GetRequest request) throws IOException {
-			return client.get(request, RequestOptions.DEFAULT);
+			return client.get(request, DEFAULT);
 		}
 	}
 
@@ -201,7 +202,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public SearchResponse operator(SearchRequest request) throws IOException {
-			return client.search(request, RequestOptions.DEFAULT);
+			return client.search(request, DEFAULT);
 		}
 	}
 
@@ -209,7 +210,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public SearchResponse operator(SearchScrollRequest request) throws IOException {
-			return client.scroll(request, RequestOptions.DEFAULT);
+			return client.scroll(request, DEFAULT);
 		}
 	}
 
@@ -217,7 +218,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public ClearScrollResponse operator(ClearScrollRequest request) throws IOException {
-			return client.clearScroll(request, RequestOptions.DEFAULT);
+			return client.clearScroll(request, DEFAULT);
 		}
 	}
 
@@ -225,7 +226,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public Boolean operator(GetIndexRequest request) throws IOException {
-			return client.indices().exists(request, RequestOptions.DEFAULT);
+			return client.indices().exists(request, DEFAULT);
 		}
 	}
 
@@ -233,7 +234,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		@Override
 		public GetAliasesResponse operator(GetAliasesRequest request) throws IOException {
-			return client.indices().getAlias(request, RequestOptions.DEFAULT);
+			return client.indices().getAlias(request, DEFAULT);
 		}
 	}
 
@@ -242,7 +243,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public boolean indicesExists(String... indices) {
-		Objects.requireNonNull(indices, "indices must not be null");
+		requireNonNull(indices, "indices must not be null");
 		GetIndexRequest request = new GetIndexRequest(indices);
 		return exec(indicesExistsOperator, request);
 	}
@@ -274,8 +275,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, List<T> sources) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(sources, "sources must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(sources, "sources must not be null");
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
@@ -289,8 +290,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, List<T> sources) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(sources, "sources must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(sources, "sources must not be null");
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
@@ -304,8 +305,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkResponse bulkDelete(String index, List<String> ids) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(ids, "ids must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(ids, "ids must not be null");
 
 		BulkRequest request = new BulkRequest();
 		ids.forEach(id -> {
@@ -319,8 +320,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public Cancellable bulkDeleteAsync(String index, List<String> ids) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(ids, "ids must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(ids, "ids must not be null");
 
 		BulkRequest request = new BulkRequest();
 		ids.forEach(id -> {
@@ -330,14 +331,14 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public GetResponse findById(String index, String id) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(id, "id must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(id, "id must not be null");
 
 		return exec(operator, new GetRequest(index, id));
 	}
 
 	public <T extends ElasticsearchId> T findById(String index, String id, Class<T> clazz) {
-		Objects.requireNonNull(clazz, "clazz must not be null");
+		requireNonNull(clazz, "clazz must not be null");
 
 		GetResponse response = findById(index, id);
 		return JSON.parseObject(response.getSourceAsString(), clazz);
@@ -348,8 +349,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, List<T> sources) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(sources, "sources must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(sources, "sources must not be null");
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
@@ -363,8 +364,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, List<T> sources) {
-		Objects.requireNonNull(index, "index must not be null");
-		Objects.requireNonNull(sources, "sources must not be null");
+		requireNonNull(index, "index must not be null");
+		requireNonNull(sources, "sources must not be null");
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
@@ -379,9 +380,9 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	public <T extends ElasticsearchId> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices,
 			Class<T> clazz) {
-		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		Objects.requireNonNull(indices, "indices must not be null");
-		Objects.requireNonNull(clazz, "clazz must not be null");
+		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		requireNonNull(indices, "indices must not be null");
+		requireNonNull(clazz, "clazz must not be null");
 
 		SearchResponse response = search(searchSourceBuilder, "1m", indices);
 		List<T> rs = new ArrayList<>();
@@ -393,8 +394,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String keepAlive, String[] indices) {
-		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		Objects.requireNonNull(indices, "indices must not be null");
+		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		requireNonNull(indices, "indices must not be null");
 
 		SearchRequest request = new SearchRequest(indices);
 		request.source(searchSourceBuilder);
@@ -410,7 +411,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public SearchResponse searchScroll(String scrollId, String keepAlive) {
-		Objects.requireNonNull(scrollId, "scrollId must not be null");
+		requireNonNull(scrollId, "scrollId must not be null");
 
 		SearchScrollRequest request = new SearchScrollRequest(scrollId);
 		if (keepAlive != null) {
@@ -424,7 +425,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public ClearScrollResponse clearScroll(List<String> scrollIds) {
-		Objects.requireNonNull(scrollIds, "scrollIds must not be null");
+		requireNonNull(scrollIds, "scrollIds must not be null");
 
 		ClearScrollRequest request = new ClearScrollRequest();
 		request.scrollIds(scrollIds);
@@ -432,7 +433,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	private <T extends ElasticsearchId> String eId(T source) {
-		return Objects.requireNonNull(source.getElasticsearchId(), "ElasticsearchId must not be null");
+		return requireNonNull(source.getElasticsearchId(), "ElasticsearchId must not be null");
 	}
 
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
@@ -444,9 +445,9 @@ public class ElasticsearchTemplate implements InitializingBean {
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
 			final int pageNumber, final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
 
-		Objects.requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		Objects.requireNonNull(indices, "indices must not be null");
-		Objects.requireNonNull(clazz, "clazz must not be null");
+		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		requireNonNull(indices, "indices must not be null");
+		requireNonNull(clazz, "clazz must not be null");
 
 		searchSourceBuilder.from(0).size(pageSize);// scroll from=0
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
@@ -489,7 +490,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkByScrollResponse deleteByQuery(DeleteByQueryRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(deleteByQueryRequestOperator, request);
 	}
 
@@ -506,7 +507,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkByScrollResponse updateByQuery(UpdateByQueryRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(updateByQueryRequestOperator, request);
 	}
 
@@ -515,7 +516,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public CountResponse count(CountRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(countRequestOperator, request);
 	}
 
@@ -528,17 +529,17 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public AcknowledgedResponse deleteIndex(DeleteIndexRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(deleteIndexOperator, request);
 	}
 
 	public ExplainResponse explain(ExplainRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(explainOperator, request);
 	}
 
 	public org.elasticsearch.client.core.AcknowledgedResponse deleteAlias(DeleteAliasRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(deleteAliasOperator, request);
 	}
 
@@ -547,17 +548,17 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public boolean exists(GetRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(existsRequestOperator, request);
 	}
 
 	public UpdateResponse update(UpdateRequest request) {
-		Objects.requireNonNull(request, "request must not be null");
+		requireNonNull(request, "request must not be null");
 		return exec(updateRequestOperator, request);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Objects.requireNonNull(client, "client must not be null");
+		requireNonNull(client, "client must not be null");
 	}
 }

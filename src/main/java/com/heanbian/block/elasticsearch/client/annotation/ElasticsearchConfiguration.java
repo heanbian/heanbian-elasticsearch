@@ -1,7 +1,8 @@
 package com.heanbian.block.elasticsearch.client.annotation;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -27,7 +28,7 @@ public class ElasticsearchConfiguration {
 
 	@Bean
 	public RestHighLevelClient restHighLevelClient() {
-		Objects.requireNonNull(connectionString, "elasticsearch.cluster-nodes is required");
+		requireNonNull(connectionString, "elasticsearch.cluster-nodes is required");
 
 		ConnectionString conn = new ConnectionString(connectionString);
 		List<String> nodes = conn.getHosts();
