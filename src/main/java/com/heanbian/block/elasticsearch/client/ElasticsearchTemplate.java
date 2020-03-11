@@ -84,7 +84,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private RestHighLevelClient client;
 
 	public ElasticsearchTemplate(RestHighLevelClient client) {
-		this.client = client;
+		this.client = requireNonNull(client, "RestHighLevelClient must not be null");
 	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
@@ -458,7 +458,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		loop: for (int i = 0; i < pageNumber; i++) {
 			SearchHit[] hits = response.getHits().getHits();
-			if (hits == null || hits.length <= 0) {
+			if (hits == null || hits.length == 0) {
 				break loop;
 			}
 			if (i == (pageNumber - 1)) {
@@ -559,6 +559,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		requireNonNull(client, "client must not be null");
+		System.setProperty("heanbian-elasticsearch-client", "11.2.1");
 	}
 }
