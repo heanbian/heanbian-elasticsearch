@@ -7,7 +7,7 @@
 <dependency>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.2.0</version>
+	<version>11.2.3</version>
 </dependency>
 
 ```
@@ -51,7 +51,7 @@ import com.heanbian.block.reactive.elasticsearch.client.ElasticsearchTemplate;
 public class XxxElasticsearch {
 
 	@Autowired
-	private ElasticsearchTemplate elasticsearchTemplate;
+	private ElasticsearchTemplate esTemplate;
 
 	//TODO
 }
