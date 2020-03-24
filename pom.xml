@@ -160,7 +160,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.2.4.RELEASE</spring-framework.version>
 		<elasticsearch.version>7.6.1</elasticsearch.version>
-		<fastjson.version>1.2.66</fastjson.version>
+		<fastjson.version>1.2.67</fastjson.version>
 		<arguments />
 	</properties>
 
