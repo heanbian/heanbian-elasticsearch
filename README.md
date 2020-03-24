@@ -25,36 +25,20 @@ elasticsearch.cluster-nodes: elasticsearch://<username>:<password>@<ip>:<port>,<
 
 ```java
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.heanbian.block.reactive.elasticsearch.client.annotation.EnableElasticsearch;
-
 @EnableElasticsearch
 @SpringBootApplication
 public class XxxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(XxxApplication.class, args);
-	}
 }
 
 ```
 
-### 在定义有任意注解 `@Component` 、`@Service` 、 `@Controller` 类中，使用样例：
+### 类中，使用样例：
 
 ```java
 
-import org.springframework.stereotype.Component;
-import com.heanbian.block.reactive.elasticsearch.client.ElasticsearchTemplate;
-
-@Component
-public class XxxElasticsearch {
-
-	@Autowired
-	private ElasticsearchTemplate esTemplate;
-
-	//TODO
-}
+@Autowired
+ElasticsearchTemplate esTemplate;
 
 ```
 
