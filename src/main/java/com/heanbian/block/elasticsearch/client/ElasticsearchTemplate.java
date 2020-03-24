@@ -6,6 +6,7 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,7 @@ import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.alibaba.fastjson.JSON;
@@ -447,20 +449,21 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
 			final int pageNumber, final int pageSize, String[] indices, String keepAlive, Class<T> clazz) {
-		
+
 		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
 		requireNonNull(indices, "indices must not be null");
 		requireNonNull(clazz, "clazz must not be null");
-		
+
 		// fetch
 		final FetchSourceContext fetch = searchSourceBuilder.fetchSource();
+		final List<SortBuilder<?>> sorts = searchSourceBuilder.sorts();
 
 		searchSourceBuilder.fetchSource(false).from(0).size(pageSize);// scroll from=0
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
 
 		final long total = response.getHits().getTotalHits().value;
 		List<String> scrollIds = new ArrayList<>();
-		List<String> esIds = new ArrayList<>();
+		List<String> esIds = new LinkedList<>();
 
 		loop: for (int i = 0; i < pageNumber; i++) {
 			SearchHit[] hits = response.getHits().getHits();
@@ -481,17 +484,19 @@ public class ElasticsearchTemplate implements InitializingBean {
 			clearScroll(scrollIds);
 		}
 
-		List<T> tss = (!esIds.isEmpty()) ? getIds(esIds, fetch, keepAlive, indices, clazz) : new ArrayList<>();
+		List<T> tss = (!esIds.isEmpty()) ? getIds(esIds, fetch, sorts, keepAlive, indices, clazz) : new ArrayList<>();
 		return new Page<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
-	
-	private <T extends ElasticsearchId> List<T> getIds(List<String> esIds, FetchSourceContext fetch, String keepAlive,
-			String[] indices, Class<T> clazz) {
 
-		final int size = esIds.size();
+	private <T extends ElasticsearchId> List<T> getIds(List<String> esIds, FetchSourceContext fetch,
+			List<SortBuilder<?>> sorts, String keepAlive, String[] indices, Class<T> clazz) {
+
 		SearchSourceBuilder s = new SearchSourceBuilder();
 		BoolQueryBuilder b = new BoolQueryBuilder();
+		final int size = esIds.size();
+
 		s.fetchSource(fetch).size(size);
+		sorts.forEach(s::sort);
 		s.query(b.filter(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[size]))));
 
 		SearchResponse response = search(s, keepAlive, indices);
@@ -588,6 +593,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		System.setProperty("heanbian-elasticsearch-client", "11.2.1");
+		System.setProperty("heanbian-elasticsearch-client", "11.2.5");
 	}
 }
