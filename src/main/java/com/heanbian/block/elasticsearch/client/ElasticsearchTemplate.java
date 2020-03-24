@@ -38,6 +38,7 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -48,6 +49,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.alibaba.fastjson.JSON;
@@ -443,12 +445,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 				clazz);
 	}
 
-	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
-			final int pageNumber, final int pageSize, final String[] indices, final String keepAlive, Class<T> clazz) {
-
-		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		requireNonNull(indices, "indices must not be null");
-		requireNonNull(clazz, "clazz must not be null");
+	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(@Nullable SearchSourceBuilder searchSourceBuilder,
+			final int pageNumber, final int pageSize, @Nullable String[] indices, @Nullable String keepAlive,
+			@Nullable Class<T> clazz) {
+		// fetch
+		final FetchSourceContext fetch = searchSourceBuilder.fetchSource();
 
 		searchSourceBuilder.fetchSource(false).from(0).size(pageSize);// scroll from=0
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
@@ -471,29 +472,32 @@ public class ElasticsearchTemplate implements InitializingBean {
 			scrollIds.add(response.getScrollId());
 			response = searchScroll(response.getScrollId(), keepAlive);
 		}
-		
+
 		if (!scrollIds.isEmpty()) {
 			clearScroll(scrollIds);
 		}
-		
-		List<T> tss = new ArrayList<>();
-		if (!esIds.isEmpty()) {
-			searchSourceBuilder.fetchSource(true);
-			searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[esIds.size()])));
-			reset(tss, searchSourceBuilder, keepAlive, indices, clazz);
-		}
+
+		List<T> tss = (!esIds.isEmpty()) ? getIds(esIds, fetch, keepAlive, indices, clazz) : new ArrayList<>();
 		return new Page<T>().setList(tss).setPageNumber(pageNumber).setPageSize(pageSize).setTotal(total);
 	}
 	
-	private <T extends ElasticsearchId> void reset(List<T> tss, SearchSourceBuilder searchSourceBuilder,
-			String keepAlive, String[] indices, Class<T> clazz) {
-		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
+	private <T extends ElasticsearchId> List<T> getIds(List<String> esIds, FetchSourceContext fetch, String keepAlive,
+			String[] indices, Class<T> clazz) {
+
+		SearchSourceBuilder s = new SearchSourceBuilder();
+		s.fetchSource(fetch).size(esIds.size());
+		s.query(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[esIds.size()])));
+
+		SearchResponse response = search(s, keepAlive, indices);
 		SearchHit[] hits = response.getHits().getHits();
+
+		List<T> tss = new ArrayList<>();
 		if (hits != null && hits.length > 0) {
 			for (SearchHit hit : hits) {
 				tss.add(JSON.parseObject(hit.getSourceAsString(), clazz));
 			}
 		}
+		return tss;
 	}
 
 	public BulkByScrollResponse deleteByQuery(QueryBuilder query, String... indices) {
