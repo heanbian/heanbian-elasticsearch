@@ -485,10 +485,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private <T extends ElasticsearchId> List<T> getIds(List<String> esIds, FetchSourceContext fetch, String keepAlive,
 			String[] indices, Class<T> clazz) {
 
+		final int size = esIds.size();
 		SearchSourceBuilder s = new SearchSourceBuilder();
 		BoolQueryBuilder b = new BoolQueryBuilder();
-		s.fetchSource(fetch).size(esIds.size());
-		s.query(b.filter(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[esIds.size()]))));
+		s.fetchSource(fetch).size(size);
+		s.query(b.filter(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[size]))));
 
 		SearchResponse response = search(s, keepAlive, indices);
 		SearchHit[] hits = response.getHits().getHits();
