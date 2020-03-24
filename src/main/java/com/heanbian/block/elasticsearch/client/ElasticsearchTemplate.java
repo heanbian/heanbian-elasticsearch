@@ -38,7 +38,6 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -446,9 +445,13 @@ public class ElasticsearchTemplate implements InitializingBean {
 				clazz);
 	}
 
-	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(@Nullable SearchSourceBuilder searchSourceBuilder,
-			final int pageNumber, final int pageSize, @Nullable String[] indices, @Nullable String keepAlive,
-			@Nullable Class<T> clazz) {
+	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			final int pageNumber, final int pageSize, String[] indices, String keepAlive, Class<T> clazz) {
+		
+		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
+		requireNonNull(indices, "indices must not be null");
+		requireNonNull(clazz, "clazz must not be null");
+		
 		// fetch
 		final FetchSourceContext fetch = searchSourceBuilder.fetchSource();
 
