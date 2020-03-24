@@ -42,6 +42,7 @@ import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -485,8 +486,9 @@ public class ElasticsearchTemplate implements InitializingBean {
 			String[] indices, Class<T> clazz) {
 
 		SearchSourceBuilder s = new SearchSourceBuilder();
+		BoolQueryBuilder b = new BoolQueryBuilder();
 		s.fetchSource(fetch).size(esIds.size());
-		s.query(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[esIds.size()])));
+		s.query(b.filter(QueryBuilders.idsQuery().addIds(esIds.toArray(new String[esIds.size()]))));
 
 		SearchResponse response = search(s, keepAlive, indices);
 		SearchHit[] hits = response.getHits().getHits();
