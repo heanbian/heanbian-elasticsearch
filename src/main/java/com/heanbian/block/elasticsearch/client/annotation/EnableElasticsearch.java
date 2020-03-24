@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
 
+import com.heanbian.block.elasticsearch.client.autoconfigure.ElasticsearchConfiguration;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(ElasticsearchConfiguration.class)
