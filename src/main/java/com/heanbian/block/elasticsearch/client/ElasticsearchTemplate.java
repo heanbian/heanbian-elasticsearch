@@ -67,6 +67,7 @@ import com.heanbian.block.elasticsearch.client.page.Page;
  */
 public class ElasticsearchTemplate implements InitializingBean {
 
+	private Executor executor = new DefaultExecutorImpl(5);
 	private AliasesOperator aliasesOperator = new AliasesOperator();
 	private BulkOperator bulkOperator = new BulkOperator();
 	private BulkAsyncOperator bulkAsyncOperator = new BulkAsyncOperator();
@@ -76,7 +77,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private DeleteIndexOperator deleteIndexOperator = new DeleteIndexOperator();
 	private DeleteByQueryRequestOperator deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
 	private DeleteAliasOperator deleteAliasOperator = new DeleteAliasOperator();
-	private Executor executor = new DefaultExecutorImpl();
 	private ExplainOperator explainOperator = new ExplainOperator();
 	private ExistsRequestOperator existsRequestOperator = new ExistsRequestOperator();
 	private GetOperator operator = new GetOperator();
@@ -86,7 +86,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
 	private UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
 
-	private RestHighLevelClient client;
+	private final RestHighLevelClient client;
 
 	public ElasticsearchTemplate(RestHighLevelClient client) {
 		this.client = requireNonNull(client, "RestHighLevelClient must not be null");
@@ -578,6 +578,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public boolean exists(String index, String id) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(id, "id must not be null");
 		return exists(new GetRequest(index, id));
 	}
 
@@ -593,6 +595,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		System.setProperty("heanbian-elasticsearch-client", "11.2.5");
+		System.setProperty("heanbian-elasticsearch-client", "11.2.7");
 	}
 }

@@ -6,12 +6,22 @@ import com.heanbian.block.elasticsearch.client.operator.Operator;
 
 public class DefaultExecutorImpl implements Executor {
 
+	private int retryCount;
+
+	public DefaultExecutorImpl(int retryCount) {
+		this.retryCount = retryCount;
+	}
+
 	@Override
 	public <R, S> S exec(Operator<R, S> operator, R request) {
-		try {
-			return operator.operator(request);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		IOException internal = null;
+		for (int i = 0; i < retryCount; i++) {
+			try {
+				return operator.operator(request);
+			} catch (IOException e) {
+				internal = e;
+			}
 		}
+		throw new RuntimeException(internal);
 	}
 }
