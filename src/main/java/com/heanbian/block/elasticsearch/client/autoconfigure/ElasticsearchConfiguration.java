@@ -28,7 +28,11 @@ public class ElasticsearchConfiguration {
 	private String connectionString;
 
 	@Bean
-	public RestHighLevelClient restHighLevelClient() {
+	public ElasticsearchTemplate elasticsearchTemplate() {
+		return new ElasticsearchTemplate(restHighLevelClient());
+	}
+
+	private RestHighLevelClient restHighLevelClient() {
 		requireNonNull(connectionString, "elasticsearch.cluster-nodes must be setting");
 
 		ConnectionString conn = new ConnectionString(connectionString);
@@ -57,11 +61,6 @@ public class ElasticsearchConfiguration {
 		}
 
 		return new RestHighLevelClient(rb);
-	}
-
-	@Bean
-	public ElasticsearchTemplate elasticsearchTemplate() {
-		return new ElasticsearchTemplate(restHighLevelClient());
 	}
 
 }

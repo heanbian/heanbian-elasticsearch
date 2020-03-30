@@ -54,7 +54,8 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heanbian.block.elasticsearch.client.executor.DefaultExecutorImpl;
 import com.heanbian.block.elasticsearch.client.executor.Executor;
 import com.heanbian.block.elasticsearch.client.operator.Operator;
@@ -67,24 +68,25 @@ import com.heanbian.block.elasticsearch.client.page.Page;
  */
 public class ElasticsearchTemplate implements InitializingBean {
 
-	private Executor executor = new DefaultExecutorImpl(5);
-	private AliasesOperator aliasesOperator = new AliasesOperator();
-	private BulkOperator bulkOperator = new BulkOperator();
-	private BulkAsyncOperator bulkAsyncOperator = new BulkAsyncOperator();
-	private CreateIndexOperator createIndexOperator = new CreateIndexOperator();
-	private ClearScrollOperator clearScrollOperator = new ClearScrollOperator();
-	private CountRequestOperator countRequestOperator = new CountRequestOperator();
-	private DeleteIndexOperator deleteIndexOperator = new DeleteIndexOperator();
-	private DeleteByQueryRequestOperator deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
-	private DeleteAliasOperator deleteAliasOperator = new DeleteAliasOperator();
-	private ExplainOperator explainOperator = new ExplainOperator();
-	private ExistsRequestOperator existsRequestOperator = new ExistsRequestOperator();
-	private GetOperator operator = new GetOperator();
-	private IndicesExistsOperator indicesExistsOperator = new IndicesExistsOperator();
-	private SearchOperator searchOperator = new SearchOperator();
-	private SearchScrollOperator searchScrollOperator = new SearchScrollOperator();
-	private UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
-	private UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
+	private final ObjectMapper mapper = new ObjectMapper();
+	private final Executor executor = new DefaultExecutorImpl(5);
+	private final AliasesOperator aliasesOperator = new AliasesOperator();
+	private final BulkOperator bulkOperator = new BulkOperator();
+	private final BulkAsyncOperator bulkAsyncOperator = new BulkAsyncOperator();
+	private final CreateIndexOperator createIndexOperator = new CreateIndexOperator();
+	private final ClearScrollOperator clearScrollOperator = new ClearScrollOperator();
+	private final CountRequestOperator countRequestOperator = new CountRequestOperator();
+	private final DeleteIndexOperator deleteIndexOperator = new DeleteIndexOperator();
+	private final DeleteByQueryRequestOperator deleteByQueryRequestOperator = new DeleteByQueryRequestOperator();
+	private final DeleteAliasOperator deleteAliasOperator = new DeleteAliasOperator();
+	private final ExplainOperator explainOperator = new ExplainOperator();
+	private final ExistsRequestOperator existsRequestOperator = new ExistsRequestOperator();
+	private final GetOperator operator = new GetOperator();
+	private final IndicesExistsOperator indicesExistsOperator = new IndicesExistsOperator();
+	private final SearchOperator searchOperator = new SearchOperator();
+	private final SearchScrollOperator searchScrollOperator = new SearchScrollOperator();
+	private final UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
+	private final UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
 
 	private final RestHighLevelClient client;
 
@@ -285,7 +287,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new IndexRequest(index).id(eId(d)).source(JSON.toJSONString(d), XContentType.JSON));
+			try {
+				String s = mapper.writeValueAsString(d);
+				request.add(new IndexRequest(index).id(eId(d)).source(s, XContentType.JSON));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		});
 		return exec(bulkOperator, request);
 	}
@@ -300,7 +307,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new IndexRequest(index).id(eId(d)).source(JSON.toJSONString(d), XContentType.JSON));
+			try {
+				String s = mapper.writeValueAsString(d);
+				request.add(new IndexRequest(index).id(eId(d)).source(s, XContentType.JSON));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		});
 		return exec(bulkAsyncOperator, request);
 	}
@@ -346,7 +358,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		requireNonNull(clazz, "clazz must not be null");
 
 		GetResponse response = findById(index, id);
-		return JSON.parseObject(response.getSourceAsString(), clazz);
+		try {
+			return mapper.readValue(response.getSourceAsString(), clazz);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, T source) {
@@ -359,7 +375,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, eId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+			try {
+				String s = mapper.writeValueAsString(d);
+				request.add(new UpdateRequest(index, eId(d)).doc(s, XContentType.JSON));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		});
 		return exec(bulkOperator, request);
 	}
@@ -374,7 +395,12 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
-			request.add(new UpdateRequest(index, eId(d)).doc(JSON.toJSONString(d), XContentType.JSON));
+			try {
+				String s = mapper.writeValueAsString(d);
+				request.add(new UpdateRequest(index, eId(d)).doc(s, XContentType.JSON));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		});
 		return exec(bulkAsyncOperator, request);
 	}
@@ -393,7 +419,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		List<T> rs = new ArrayList<>();
 		SearchHit[] hits = response.getHits().getHits();
 		for (SearchHit h : hits) {
-			rs.add(JSON.parseObject(h.getSourceAsString(), clazz));
+			try {
+				rs.add(mapper.readValue(h.getSourceAsString(), clazz));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return rs;
 	}
@@ -505,7 +535,11 @@ public class ElasticsearchTemplate implements InitializingBean {
 		List<T> tss = new ArrayList<>();
 		if (hits != null && hits.length > 0) {
 			for (SearchHit hit : hits) {
-				tss.add(JSON.parseObject(hit.getSourceAsString(), clazz));
+				try {
+					tss.add(mapper.readValue(hit.getSourceAsString(), clazz));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		return tss;

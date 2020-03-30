@@ -20,6 +20,10 @@ public class DefaultExecutorImpl implements Executor {
 				return operator.operator(request);
 			} catch (IOException e) {
 				internal = e;
+				try {
+					Thread.sleep(1000L);
+				} catch (InterruptedException e1) {
+				}
 			}
 		}
 		throw new RuntimeException(internal);

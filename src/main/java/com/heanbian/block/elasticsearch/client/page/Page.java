@@ -1,11 +1,6 @@
 package com.heanbian.block.elasticsearch.client.page;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import org.elasticsearch.search.SearchHit;
-
-import com.alibaba.fastjson.JSON;
 
 public class Page<I> {
 
@@ -79,15 +74,15 @@ public class Page<I> {
 		return this;
 	}
 
-	public Page<I> setList(SearchHit[] hits, Class<I> clazz) {
-		final int len = hits.length;
-		if (list == null) {
-			list = new ArrayList<>(len);
-		}
-		for (int i = 0; i < len; i++) {
-			list.add(JSON.parseObject(hits[i].getSourceAsString(), clazz));
-		}
-		return this;
-	}
+//	public Page<I> setList(SearchHit[] hits, Class<I> clazz) {
+//		final int len = hits.length;
+//		if (list == null) {
+//			list = new ArrayList<>(len);
+//		}
+//		for (int i = 0; i < len; i++) {
+//			list.add(JSON.parseObject(hits[i].getSourceAsString(), clazz));
+//		}
+//		return this;
+//	}
 
 }
