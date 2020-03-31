@@ -55,6 +55,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heanbian.block.elasticsearch.client.executor.DefaultExecutorImpl;
 import com.heanbian.block.elasticsearch.client.executor.Executor;
@@ -87,7 +88,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private final SearchScrollOperator searchScrollOperator = new SearchScrollOperator();
 	private final UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
 	private final UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
-
 	private final RestHighLevelClient client;
 
 	public ElasticsearchTemplate(RestHighLevelClient client) {
@@ -265,6 +265,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	public CreateIndexResponse createIndex(String index, int shards, int replicas, Map<String, ?> mapping,
 			Map<String, ?> alias) {
+		requireNonNull(index, "index must not be null");
+
 		CreateIndexRequest request = new CreateIndexRequest(index);
 		request.settings(
 				Settings.builder().put("index.number_of_shards", shards).put("index.number_of_replicas", replicas));
@@ -278,6 +280,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, T source) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(source, "source must not be null");
 		return bulkInsert(index, Arrays.asList(source));
 	}
 
@@ -298,6 +302,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, T source) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(source, "source must not be null");
 		return bulkInsertAsync(index, Arrays.asList(source));
 	}
 
@@ -318,6 +324,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkResponse bulkDelete(String index, String... ids) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(ids, "ids must not be null");
 		return bulkDelete(index, Arrays.asList(ids));
 	}
 
@@ -333,6 +341,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public Cancellable bulkDeleteAsync(String index, String... ids) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(ids, "ids must not be null");
 		return bulkDeleteAsync(index, Arrays.asList(ids));
 	}
 
@@ -366,6 +376,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, T source) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(source, "source must not be null");
 		return bulkUpdate(index, Arrays.asList(source));
 	}
 
@@ -386,6 +398,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, T source) {
+		requireNonNull(index, "index must not be null");
+		requireNonNull(source, "source must not be null");
 		return bulkUpdateAsync(index, Arrays.asList(source));
 	}
 
@@ -546,6 +560,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public BulkByScrollResponse deleteByQuery(QueryBuilder query, String... indices) {
+		requireNonNull(query, "query must not be null");
+		requireNonNull(indices, "indices must not be null");
 		DeleteByQueryRequest request = new DeleteByQueryRequest(indices);
 		request.setConflicts("proceed");
 		request.setQuery(query);
@@ -580,6 +596,8 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public CountResponse count(QueryBuilder query, String... indices) {
+		requireNonNull(query, "query must not be null");
+		requireNonNull(indices, "indices must not be null");
 		return count(new CountRequest(indices, query));
 	}
 
@@ -593,6 +611,7 @@ public class ElasticsearchTemplate implements InitializingBean {
 	}
 
 	public AcknowledgedResponse deleteIndex(String... indices) {
+		requireNonNull(indices, "indices must not be null");
 		return deleteIndex(new DeleteIndexRequest(indices));
 	}
 
@@ -629,6 +648,6 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		System.setProperty("heanbian-elasticsearch-client", "11.2.7");
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 }

@@ -5,7 +5,7 @@
 
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.2.8</version>
+	<version>11.2.9</version>
 	<packaging>jar</packaging>
 
 	<name>heanbian-elasticsearch-client</name>
