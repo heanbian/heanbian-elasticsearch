@@ -369,6 +369,9 @@ public class ElasticsearchTemplate implements InitializingBean {
 
 		GetResponse response = findById(index, id);
 		try {
+			if (response.getSourceAsString() == null) {
+				return null;
+			}
 			return mapper.readValue(response.getSourceAsString(), clazz);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
