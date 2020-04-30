@@ -52,7 +52,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortBuilder;
-import org.springframework.beans.factory.InitializingBean;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -64,12 +63,11 @@ import com.heanbian.block.elasticsearch.client.page.Page;
 
 /**
  * 
- * @author heanbian
+ * @author 马洪
  *
  */
-public class ElasticsearchTemplate implements InitializingBean {
+public class ElasticsearchTemplate {
 
-	private final ObjectMapper mapper = new ObjectMapper();
 	private final Executor executor = new DefaultExecutorImpl(5);
 	private final AliasesOperator aliasesOperator = new AliasesOperator();
 	private final BulkOperator bulkOperator = new BulkOperator();
@@ -88,10 +86,13 @@ public class ElasticsearchTemplate implements InitializingBean {
 	private final SearchScrollOperator searchScrollOperator = new SearchScrollOperator();
 	private final UpdateRequestOperator updateRequestOperator = new UpdateRequestOperator();
 	private final UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
-	private final RestHighLevelClient client;
 
-	public ElasticsearchTemplate(RestHighLevelClient client) {
-		this.client = requireNonNull(client, "RestHighLevelClient must not be null");
+	private final RestHighLevelClient client;
+	private final ObjectMapper mapper = new ObjectMapper();
+
+	public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient) {
+		this.client = requireNonNull(restHighLevelClient, "restHighLevelClient must not be null");
+		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
@@ -649,8 +650,4 @@ public class ElasticsearchTemplate implements InitializingBean {
 		return exec(updateRequestOperator, request);
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
 }
