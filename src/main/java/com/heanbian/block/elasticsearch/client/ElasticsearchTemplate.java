@@ -90,6 +90,10 @@ public class ElasticsearchTemplate {
 	private final RestHighLevelClient client;
 	private final ObjectMapper mapper = new ObjectMapper();
 
+	public ElasticsearchTemplate(ConnectionString connectionString) {
+		throw new UnsupportedOperationException();
+	}
+
 	public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient) {
 		this.client = requireNonNull(restHighLevelClient, "restHighLevelClient must not be null");
 		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
