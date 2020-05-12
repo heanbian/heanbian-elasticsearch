@@ -3,12 +3,23 @@ package com.heanbian.block.elasticsearch.client;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.http.auth.AuthScope.ANY;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.http.HttpHost;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
+import org.elasticsearch.client.RestHighLevelClient;
 
 public class ConnectionString {
 
@@ -67,6 +78,35 @@ public class ConnectionString {
 
 	public String getConnectionString() {
 		return connectionString;
+	}
+
+	public RestHighLevelClient getRestHighLevelClient() {
+		ConnectionString conn = this;
+		List<String> nodes = conn.getHosts();
+		final int size = nodes.size();
+		HttpHost[] hosts = new HttpHost[size];
+
+		for (int i = 0; i < size; i++) {
+			String[] s = nodes.get(i).split(":");
+			if (s.length == 2) {
+				hosts[i] = new HttpHost(s[0], Integer.valueOf(s[1]));
+			}
+		}
+
+		RestClientBuilder rb = RestClient.builder(hosts);
+		if (conn.getUsername() != null && conn.getPassword() != null) {
+			final CredentialsProvider credentials = new BasicCredentialsProvider();
+			credentials.setCredentials(ANY, new UsernamePasswordCredentials(conn.getUsername(), conn.getPassword()));
+
+			rb.setHttpClientConfigCallback(new HttpClientConfigCallback() {
+				@Override
+				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+					return httpClientBuilder.setDefaultCredentialsProvider(credentials);
+				}
+			});
+		}
+
+		return new RestHighLevelClient(rb);
 	}
 
 	private List<String> parseHosts(final List<String> rawHosts) {

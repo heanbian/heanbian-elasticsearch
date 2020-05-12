@@ -90,8 +90,8 @@ public class ElasticsearchTemplate {
 	private final RestHighLevelClient client;
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public ElasticsearchTemplate(ConnectionString connectionString) {
-		throw new UnsupportedOperationException();
+	public ElasticsearchTemplate(String connectionString) {
+		this(new ConnectionString(connectionString).getRestHighLevelClient());
 	}
 
 	public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient) {
