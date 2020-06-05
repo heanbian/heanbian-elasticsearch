@@ -5,7 +5,7 @@
 
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.3.5</version>
+	<version>11.3.6</version>
 	<packaging>jar</packaging>
 
 	<name>heanbian-elasticsearch-client</name>
@@ -158,7 +158,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>7.7.0</elasticsearch.version>
+		<elasticsearch.version>7.7.1</elasticsearch.version>
 		<jackson.version>2.11.0</jackson.version>
 		<arguments />
 	</properties>
