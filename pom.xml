@@ -10,7 +10,7 @@
 
 	<name>heanbian-elasticsearch-client</name>
 	<url>https://github.com/heanbian/heanbian-elasticsearch-client</url>
-	<description>Heanbian elasticsearch client components.</description>
+	<description>Heanbian elasticsearch client component.</description>
 	<inceptionYear>2019</inceptionYear>
 
 	<licenses>
