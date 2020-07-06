@@ -514,8 +514,8 @@ public class ElasticsearchTemplate {
 		SearchResponse response = search(searchSourceBuilder, keepAlive, indices);
 
 		final long total = response.getHits().getTotalHits().value;
-		List<String> scrollIds = new ArrayList<>();
 		List<String> esIds = new LinkedList<>();
+		String scrollId = null;
 
 		loop: for (int i = 0; i < pageNumber; i++) {
 			SearchHit[] hits = response.getHits().getHits();
@@ -528,12 +528,12 @@ public class ElasticsearchTemplate {
 				}
 				break loop;
 			}
-			scrollIds.add(response.getScrollId());
+			scrollId = response.getScrollId();
 			response = searchScroll(response.getScrollId(), keepAlive);
 		}
 
-		if (!scrollIds.isEmpty()) {
-			clearScroll(scrollIds);
+		if (scrollId != null) {
+			clearScroll(scrollId);
 		}
 
 		List<T> tss = (!esIds.isEmpty()) ? getIds(esIds, fetch, sorts, keepAlive, indices, clazz) : new ArrayList<>();
