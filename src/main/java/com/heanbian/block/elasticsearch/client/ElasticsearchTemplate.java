@@ -298,7 +298,7 @@ public class ElasticsearchTemplate {
 		sources.forEach(d -> {
 			try {
 				String s = mapper.writeValueAsString(d);
-				request.add(new IndexRequest(index).id(eId(d)).source(s, XContentType.JSON));
+				request.add(new IndexRequest(index).id(esId(d)).source(s, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -320,7 +320,7 @@ public class ElasticsearchTemplate {
 		sources.forEach(d -> {
 			try {
 				String s = mapper.writeValueAsString(d);
-				request.add(new IndexRequest(index).id(eId(d)).source(s, XContentType.JSON));
+				request.add(new IndexRequest(index).id(esId(d)).source(s, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -397,7 +397,7 @@ public class ElasticsearchTemplate {
 		sources.forEach(d -> {
 			try {
 				String s = mapper.writeValueAsString(d);
-				request.add(new UpdateRequest(index, eId(d)).doc(s, XContentType.JSON));
+				request.add(new UpdateRequest(index, esId(d)).doc(s, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -419,7 +419,7 @@ public class ElasticsearchTemplate {
 		sources.forEach(d -> {
 			try {
 				String s = mapper.writeValueAsString(d);
-				request.add(new UpdateRequest(index, eId(d)).doc(s, XContentType.JSON));
+				request.add(new UpdateRequest(index, esId(d)).doc(s, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -489,8 +489,13 @@ public class ElasticsearchTemplate {
 		return exec(clearScrollOperator, request);
 	}
 
-	private <T extends ElasticsearchId> String eId(T source) {
+	private <T extends ElasticsearchId> String esId(T source) {
 		return requireNonNull(source.getElasticsearchId(), "ElasticsearchId must not be null");
+	}
+
+	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
+			int pageNumber, int pageSize, String index, Class<T> clazz) {
+		return searchScrollDeepPaging(searchSourceBuilder, pageNumber, pageSize, new String[] { index }, "1m", clazz);
 	}
 
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,

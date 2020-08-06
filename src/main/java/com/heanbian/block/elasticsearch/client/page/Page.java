@@ -5,19 +5,14 @@ import java.util.List;
 public class Page<I> {
 
 	/**
-	 * 当前页号
+	 * 当前页
 	 */
 	private int pageNumber = 1;
 
 	/**
-	 * 页大小
+	 * 每页大小
 	 */
 	private int pageSize = 10;
-
-	/**
-	 * 总页数
-	 */
-	private long totalPage;
 
 	/**
 	 * 总数
@@ -25,12 +20,9 @@ public class Page<I> {
 	private long total;
 
 	/**
-	 * 结果集
+	 * 业务数据
 	 */
 	private List<I> list;
-
-	public Page() {
-	}
 
 	public int getPageNumber() {
 		return pageNumber;
@@ -61,8 +53,7 @@ public class Page<I> {
 
 	// 总页数 = （总记录数 + 每页数据大小 - 1） / 每页数据大小
 	public long getTotalPage() {
-		this.totalPage = (total + pageSize - 1) / pageSize;
-		return totalPage;
+		return (total + pageSize - 1) / pageSize;
 	}
 
 	public List<I> getList() {
