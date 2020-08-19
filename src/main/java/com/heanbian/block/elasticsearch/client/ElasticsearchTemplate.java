@@ -184,11 +184,11 @@ public class ElasticsearchTemplate {
 			return client.bulkAsync(request, DEFAULT, new ActionListener<BulkResponse>() {
 
 				@Override
-				public void onResponse(BulkResponse response) {
+				public void onResponse(BulkResponse response) {// ignore
 				}
 
 				@Override
-				public void onFailure(Exception e) {
+				public void onFailure(Exception e) {// ignore
 				}
 			});
 		}
