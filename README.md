@@ -1,5 +1,7 @@
 # heanbian-elasticsearch-client
 
+基于elasticsearch-rest-high-level-client加强版
+
 ## 前提条件
 JDK11+
 ## pom.xml
