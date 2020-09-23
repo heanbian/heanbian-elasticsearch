@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -52,10 +54,13 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.heanbian.block.elasticsearch.client.executor.DefaultExecutorImpl;
 import com.heanbian.block.elasticsearch.client.executor.Executor;
 import com.heanbian.block.elasticsearch.client.operator.Operator;
@@ -67,6 +72,7 @@ import com.heanbian.block.elasticsearch.client.page.Page;
  *
  */
 public class ElasticsearchTemplate {
+	private final static String DATE_TIME_FORMATTER = "yyyy-MM-dd HH:mm:ss";
 
 	private final Executor executor = new DefaultExecutorImpl(5);
 	private final AliasesOperator aliasesOperator = new AliasesOperator();
@@ -93,13 +99,20 @@ public class ElasticsearchTemplate {
 	public ElasticsearchTemplate(String connectionString) {
 		ConnectionString connection = new ConnectionString(connectionString);
 		this.client = connection.getRestHighLevelClient();
-		this.mapper = new ObjectMapper();
+		this.mapper = defaultObjectMapper();
 		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	public ElasticsearchTemplate(RestHighLevelClient client, ObjectMapper mapper) {
 		this.client = client;
 		this.mapper = mapper;
+	}
+
+	private ObjectMapper defaultObjectMapper() {
+		DateTimeFormatter f = DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER);
+		return new Jackson2ObjectMapperBuilder().findModulesViaServiceLoader(true)
+				.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(f))
+				.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(f)).build();
 	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
