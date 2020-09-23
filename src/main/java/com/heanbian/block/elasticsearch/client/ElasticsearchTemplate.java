@@ -63,7 +63,7 @@ import com.heanbian.block.elasticsearch.client.page.Page;
 
 /**
  * 
- * @author 马洪
+ * @author Heanbian
  *
  */
 public class ElasticsearchTemplate {
@@ -88,15 +88,18 @@ public class ElasticsearchTemplate {
 	private final UpdateByQueryRequestOperator updateByQueryRequestOperator = new UpdateByQueryRequestOperator();
 
 	private final RestHighLevelClient client;
-	private final ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper;
 
 	public ElasticsearchTemplate(String connectionString) {
-		this(new ConnectionString(connectionString).getRestHighLevelClient());
+		ConnectionString connection = new ConnectionString(connectionString);
+		this.client = connection.getRestHighLevelClient();
+		this.mapper = new ObjectMapper();
+		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-	public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient) {
-		this.client = requireNonNull(restHighLevelClient, "restHighLevelClient must not be null");
-		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	public ElasticsearchTemplate(RestHighLevelClient client, ObjectMapper mapper) {
+		this.client = client;
+		this.mapper = mapper;
 	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
