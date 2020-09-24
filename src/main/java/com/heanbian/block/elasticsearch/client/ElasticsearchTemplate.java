@@ -59,6 +59,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.heanbian.block.elasticsearch.client.executor.DefaultExecutorImpl;
@@ -110,7 +111,7 @@ public class ElasticsearchTemplate {
 
 	private ObjectMapper defaultObjectMapper() {
 		DateTimeFormatter f = DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER);
-		return new Jackson2ObjectMapperBuilder().findModulesViaServiceLoader(true)
+		return Jackson2ObjectMapperBuilder.json().modules(new JavaTimeModule())
 				.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(f))
 				.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(f)).build();
 	}
