@@ -1,7 +1,5 @@
 # heanbian-elasticsearch-client
 
-基于elasticsearch-rest-high-level-client加强版
-
 ## 前提条件
 JDK11+
 ## pom.xml
@@ -12,7 +10,7 @@ JDK11+
 <dependency>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.4.1</version>
+	<version>11.6.0</version>
 </dependency>
 ```
 
