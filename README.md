@@ -10,7 +10,7 @@ JDK11+
 <dependency>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.6.0</version>
+	<version>11.6.1</version>
 </dependency>
 ```
 
