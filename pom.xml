@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.heanbian</groupId>
-	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.6.4</version>
+	<groupId>com.heanbian.block</groupId>
+	<artifactId>heanbian-elasticsearch</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>heanbian-elasticsearch-client</name>
-	<url>https://github.com/heanbian/heanbian-elasticsearch-client</url>
-	<description>Heanbian elasticsearch client component.</description>
+	<name>heanbian-elasticsearch</name>
+	<url>https://github.com/heanbian/heanbian-elasticsearch</url>
+	<description>Heanbian elasticsearch component.</description>
 	<inceptionYear>2019</inceptionYear>
 
 	<licenses>
@@ -35,14 +35,14 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/heanbian/heanbian-elasticsearch-client.git</connection>
-		<developerConnection>scm:git:https://github.com/heanbian/heanbian-elasticsearch-client.git</developerConnection>
-		<url>https://github.com/heanbian/heanbian-elasticsearch-client</url>
+		<connection>scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</connection>
+		<developerConnection>scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</developerConnection>
+		<url>https://github.com/heanbian/heanbian-elasticsearch</url>
 	</scm>
 
 	<issueManagement>
 		<system>Github</system>
-		<url>https://github.com/heanbian/heanbian-elasticsearch-client/issues</url>
+		<url>https://github.com/heanbian/heanbian-elasticsearch/issues</url>
 	</issueManagement>
 
 	<repositories>

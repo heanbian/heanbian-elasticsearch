@@ -1,4 +1,4 @@
-# heanbian-elasticsearch-client
+# heanbian-elasticsearch
 
 ## 前提条件
 JDK11+
@@ -9,9 +9,9 @@ JDK11+
 
 ```
 <dependency>
-	<groupId>com.heanbian</groupId>
-	<artifactId>heanbian-elasticsearch-client</artifactId>
-	<version>11.6.2</version>
+	<groupId>com.heanbian.block</groupId>
+	<artifactId>heanbian-elasticsearch</artifactId>
+	<version>1.0.0</version>
 </dependency>
 ```
 
