@@ -11,14 +11,14 @@ JDK11+
 <dependency>
 	<groupId>com.heanbian.block</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 </dependency>
 ```
 
 ## 使用示例
 
 ```
-String connectionString = "es://<username>:<password>@<ip1>:<port1>,<ip2>:<port2>";
+String connectionString = "elasticsearch://<username>:<password>@<ip1>:<port1>,<ip2>:<port2>";
 ElasticsearchTemplate esTemplate = new ElasticsearchTemplate(connectionString);
 ```
 

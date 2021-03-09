@@ -23,7 +23,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 
 public class ConnectionString {
 
-	private static final String ELASTICSEARCH_PREFIX = "es://";
+	private static final String ELASTICSEARCH_PREFIX = "elasticsearch://";
 	private String connectionString;
 	private String username;
 	private String password;
