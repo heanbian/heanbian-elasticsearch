@@ -1,17 +1,18 @@
 # heanbian-elasticsearch
 
 ## 前提条件
+
 JDK11+
 
 ## pom.xml
 
-具体版本，可以上Maven中央仓库查询
+具体版本，可以从 Maven Central 获得
 
 ```
 <dependency>
-	<groupId>com.heanbian.block</groupId>
-	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>1.0.5</version>
+  <groupId>com.heanbian.block</groupId>
+  <artifactId>heanbian-elasticsearch</artifactId>
+  <version>1.0.5</version>
 </dependency>
 ```
 
@@ -19,7 +20,8 @@ JDK11+
 
 ```
 String connectionString = "elasticsearch://<username>:<password>@<ip1>:<port1>,<ip2>:<port2>";
-ElasticsearchTemplate esTemplate = new ElasticsearchTemplate(connectionString);
 ```
+
+> ElasticsearchTemplate
 
 说明：暂无。
