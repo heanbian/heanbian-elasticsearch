@@ -54,7 +54,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortBuilder;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -98,10 +97,7 @@ public class ElasticsearchTemplate {
 	private final ObjectMapper mapper;
 
 	public ElasticsearchTemplate(String connectionString) {
-		ConnectionString connection = new ConnectionString(connectionString);
-		this.client = connection.getRestHighLevelClient();
-		this.mapper = defaultObjectMapper();
-		this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		this(new ConnectionString(connectionString).getRestHighLevelClient(), defaultObjectMapper());
 	}
 
 	public ElasticsearchTemplate(RestHighLevelClient client, ObjectMapper mapper) {
@@ -109,15 +105,19 @@ public class ElasticsearchTemplate {
 		this.mapper = mapper;
 	}
 
-	private ObjectMapper defaultObjectMapper() {
+	static ObjectMapper defaultObjectMapper() {
 		DateTimeFormatter f = DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER);
 
 		JavaTimeModule module = new JavaTimeModule();
 		LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(f);
 		module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
 
-		return Jackson2ObjectMapperBuilder.json().modules(module)
-				.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).build();
+		ObjectMapper om = new ObjectMapper();
+		om.registerModules(module);
+		om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		return om;
 	}
 
 	public <R, S> S exec(Operator<R, S> operator, R request) {
