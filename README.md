@@ -1,8 +1,10 @@
 # heanbian-elasticsearch
 
-## 前提条件
+## 依赖条件
 
-JDK11+
+JDK 11
+
+Elasticsearch 7.12.0
 
 ## pom.xml
 
