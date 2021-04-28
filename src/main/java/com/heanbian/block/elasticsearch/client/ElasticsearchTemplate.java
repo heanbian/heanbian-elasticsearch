@@ -109,8 +109,7 @@ public class ElasticsearchTemplate {
 		DateTimeFormatter f = DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER);
 
 		JavaTimeModule module = new JavaTimeModule();
-		LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(f);
-		module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+		module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(f));
 
 		ObjectMapper om = new ObjectMapper();
 		om.registerModules(module);
