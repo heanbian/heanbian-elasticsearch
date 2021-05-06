@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -449,7 +448,7 @@ public class ElasticsearchTemplate {
 	}
 
 	public ClearScrollResponse clearScroll(String... scrollId) {
-		return clearScroll(Arrays.asList(scrollId));
+		return clearScroll(List.of(scrollId));
 	}
 
 	public ClearScrollResponse clearScroll(List<String> scrollIds) {
