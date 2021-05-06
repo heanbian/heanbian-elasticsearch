@@ -1,6 +1,5 @@
 package com.heanbian.block.elasticsearch.client;
 
-import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 import java.io.IOException;
@@ -105,7 +104,7 @@ public class ElasticsearchTemplate {
 		this.mapper = mapper;
 	}
 
-	static ObjectMapper defaultObjectMapper() {
+	private static ObjectMapper defaultObjectMapper() {
 		DateTimeFormatter f = DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER);
 
 		JavaTimeModule module = new JavaTimeModule();
@@ -275,9 +274,7 @@ public class ElasticsearchTemplate {
 	}
 
 	public boolean indicesExists(String... indices) {
-		requireNonNull(indices, "indices must not be null");
-		GetIndexRequest request = new GetIndexRequest(indices);
-		return exec(indicesExistsOperator, request);
+		return exec(indicesExistsOperator, new GetIndexRequest(indices));
 	}
 
 	public CreateIndexResponse createIndex(String index, int shards, int replicas) {
@@ -290,8 +287,6 @@ public class ElasticsearchTemplate {
 
 	public CreateIndexResponse createIndex(String index, int shards, int replicas, Map<String, ?> mapping,
 			Map<String, ?> alias) {
-		requireNonNull(index, "index must not be null");
-
 		CreateIndexRequest request = new CreateIndexRequest(index);
 		request.settings(
 				Settings.builder().put("index.number_of_shards", shards).put("index.number_of_replicas", replicas));
@@ -305,15 +300,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, T source) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(source, "source must not be null");
-		return bulkInsert(index, Arrays.asList(source));
+		return bulkInsert(index, List.of(source));
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkInsert(String index, List<T> sources) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(sources, "sources must not be null");
-
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
@@ -327,15 +317,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, T source) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(source, "source must not be null");
-		return bulkInsertAsync(index, Arrays.asList(source));
+		return bulkInsertAsync(index, List.of(source));
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkInsertAsync(String index, List<T> sources) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(sources, "sources must not be null");
-
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
@@ -349,15 +334,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public BulkResponse bulkDelete(String index, String... ids) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(ids, "ids must not be null");
-		return bulkDelete(index, Arrays.asList(ids));
+		return bulkDelete(index, List.of(ids));
 	}
 
 	public BulkResponse bulkDelete(String index, List<String> ids) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(ids, "ids must not be null");
-
 		BulkRequest request = new BulkRequest();
 		ids.forEach(id -> {
 			request.add(new DeleteRequest(index, id));
@@ -366,15 +346,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public Cancellable bulkDeleteAsync(String index, String... ids) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(ids, "ids must not be null");
-		return bulkDeleteAsync(index, Arrays.asList(ids));
+		return bulkDeleteAsync(index, List.of(ids));
 	}
 
 	public Cancellable bulkDeleteAsync(String index, List<String> ids) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(ids, "ids must not be null");
-
 		BulkRequest request = new BulkRequest();
 		ids.forEach(id -> {
 			request.add(new DeleteRequest(index, id));
@@ -383,15 +358,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public GetResponse findById(String index, String id) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(id, "id must not be null");
-
 		return exec(operator, new GetRequest(index, id));
 	}
 
 	public <T extends ElasticsearchId> T findById(String index, String id, Class<T> clazz) {
-		requireNonNull(clazz, "clazz must not be null");
-
 		GetResponse response = findById(index, id);
 		try {
 			if (response.getSourceAsString() == null) {
@@ -404,15 +374,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, T source) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(source, "source must not be null");
-		return bulkUpdate(index, Arrays.asList(source));
+		return bulkUpdate(index, List.of(source));
 	}
 
 	public <T extends ElasticsearchId> BulkResponse bulkUpdate(String index, List<T> sources) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(sources, "sources must not be null");
-
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
@@ -426,15 +391,10 @@ public class ElasticsearchTemplate {
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, T source) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(source, "source must not be null");
-		return bulkUpdateAsync(index, Arrays.asList(source));
+		return bulkUpdateAsync(index, List.of(source));
 	}
 
 	public <T extends ElasticsearchId> Cancellable bulkUpdateAsync(String index, List<T> sources) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(sources, "sources must not be null");
-
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
@@ -453,10 +413,6 @@ public class ElasticsearchTemplate {
 
 	public <T extends ElasticsearchId> List<T> search(SearchSourceBuilder searchSourceBuilder, String[] indices,
 			Class<T> clazz) {
-		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		requireNonNull(indices, "indices must not be null");
-		requireNonNull(clazz, "clazz must not be null");
-
 		SearchResponse response = search(searchSourceBuilder, "1m", indices);
 		List<T> rs = new ArrayList<>();
 		SearchHit[] hits = response.getHits().getHits();
@@ -471,9 +427,6 @@ public class ElasticsearchTemplate {
 	}
 
 	public SearchResponse search(SearchSourceBuilder searchSourceBuilder, String keepAlive, String[] indices) {
-		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		requireNonNull(indices, "indices must not be null");
-
 		SearchRequest request = new SearchRequest(indices);
 		request.source(searchSourceBuilder);
 		if (keepAlive == null) {
@@ -488,8 +441,6 @@ public class ElasticsearchTemplate {
 	}
 
 	public SearchResponse searchScroll(String scrollId, String keepAlive) {
-		requireNonNull(scrollId, "scrollId must not be null");
-
 		SearchScrollRequest request = new SearchScrollRequest(scrollId);
 		if (keepAlive != null) {
 			request.scroll(keepAlive);
@@ -502,15 +453,13 @@ public class ElasticsearchTemplate {
 	}
 
 	public ClearScrollResponse clearScroll(List<String> scrollIds) {
-		requireNonNull(scrollIds, "scrollIds must not be null");
-
 		ClearScrollRequest request = new ClearScrollRequest();
 		request.scrollIds(scrollIds);
 		return exec(clearScrollOperator, request);
 	}
 
 	private <T extends ElasticsearchId> String esId(T source) {
-		return requireNonNull(source.getElasticsearchId(), "ElasticsearchId must not be null");
+		return source.getElasticsearchId();
 	}
 
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
@@ -526,10 +475,6 @@ public class ElasticsearchTemplate {
 
 	public <T extends ElasticsearchId> Page<T> searchScrollDeepPaging(SearchSourceBuilder searchSourceBuilder,
 			final int pageNumber, final int pageSize, String[] indices, String keepAlive, Class<T> clazz) {
-
-		requireNonNull(searchSourceBuilder, "searchSourceBuilder must not be null");
-		requireNonNull(indices, "indices must not be null");
-		requireNonNull(clazz, "clazz must not be null");
 
 		// fetch
 		final FetchSourceContext fetch = searchSourceBuilder.fetchSource();
@@ -593,8 +538,6 @@ public class ElasticsearchTemplate {
 	}
 
 	public BulkByScrollResponse deleteByQuery(QueryBuilder query, String... indices) {
-		requireNonNull(query, "query must not be null");
-		requireNonNull(indices, "indices must not be null");
 		DeleteByQueryRequest request = new DeleteByQueryRequest(indices);
 		request.setConflicts("proceed");
 		request.setQuery(query);
@@ -607,7 +550,6 @@ public class ElasticsearchTemplate {
 	}
 
 	public BulkByScrollResponse deleteByQuery(DeleteByQueryRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(deleteByQueryRequestOperator, request);
 	}
 
@@ -624,18 +566,14 @@ public class ElasticsearchTemplate {
 	}
 
 	public BulkByScrollResponse updateByQuery(UpdateByQueryRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(updateByQueryRequestOperator, request);
 	}
 
 	public CountResponse count(QueryBuilder query, String... indices) {
-		requireNonNull(query, "query must not be null");
-		requireNonNull(indices, "indices must not be null");
 		return count(new CountRequest(indices, query));
 	}
 
 	public CountResponse count(CountRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(countRequestOperator, request);
 	}
 
@@ -644,38 +582,30 @@ public class ElasticsearchTemplate {
 	}
 
 	public AcknowledgedResponse deleteIndex(String... indices) {
-		requireNonNull(indices, "indices must not be null");
 		return deleteIndex(new DeleteIndexRequest(indices));
 	}
 
 	public AcknowledgedResponse deleteIndex(DeleteIndexRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(deleteIndexOperator, request);
 	}
 
 	public ExplainResponse explain(ExplainRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(explainOperator, request);
 	}
 
 	public org.elasticsearch.client.core.AcknowledgedResponse deleteAlias(DeleteAliasRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(deleteAliasOperator, request);
 	}
 
 	public boolean exists(String index, String id) {
-		requireNonNull(index, "index must not be null");
-		requireNonNull(id, "id must not be null");
 		return exists(new GetRequest(index, id));
 	}
 
 	public boolean exists(GetRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(existsRequestOperator, request);
 	}
 
 	public UpdateResponse update(UpdateRequest request) {
-		requireNonNull(request, "request must not be null");
 		return exec(updateRequestOperator, request);
 	}
 
