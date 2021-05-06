@@ -89,7 +89,7 @@ public class ConnectionString {
 		for (int i = 0; i < size; i++) {
 			String[] s = nodes.get(i).split(":");
 			if (s.length == 2) {
-				hosts[i] = new HttpHost(s[0], Integer.valueOf(s[1]));
+				hosts[i] = new HttpHost(s[0], Integer.parseInt(s[1]));
 			}
 		}
 
