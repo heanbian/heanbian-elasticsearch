@@ -306,8 +306,8 @@ public class ElasticsearchTemplate {
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
-				String s = mapper.writeValueAsString(d);
-				request.add(new IndexRequest(index).id(esId(d)).source(s, XContentType.JSON));
+				byte[] json = mapper.writeValueAsBytes(d);
+				request.add(new IndexRequest(index).id(esId(d)).source(json, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -323,8 +323,8 @@ public class ElasticsearchTemplate {
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
-				String s = mapper.writeValueAsString(d);
-				request.add(new IndexRequest(index).id(esId(d)).source(s, XContentType.JSON));
+				byte[] json = mapper.writeValueAsBytes(d);
+				request.add(new IndexRequest(index).id(esId(d)).source(json, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -380,8 +380,8 @@ public class ElasticsearchTemplate {
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
-				String s = mapper.writeValueAsString(d);
-				request.add(new UpdateRequest(index, esId(d)).doc(s, XContentType.JSON));
+				byte[] json = mapper.writeValueAsBytes(d);
+				request.add(new UpdateRequest(index, esId(d)).doc(json, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -397,8 +397,8 @@ public class ElasticsearchTemplate {
 		BulkRequest request = new BulkRequest();
 		sources.forEach(d -> {
 			try {
-				String s = mapper.writeValueAsString(d);
-				request.add(new UpdateRequest(index, esId(d)).doc(s, XContentType.JSON));
+				byte[] json = mapper.writeValueAsBytes(d);
+				request.add(new UpdateRequest(index, esId(d)).doc(json, XContentType.JSON));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
