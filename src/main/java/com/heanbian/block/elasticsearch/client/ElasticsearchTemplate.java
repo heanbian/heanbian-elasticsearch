@@ -363,7 +363,7 @@ public class ElasticsearchTemplate {
 	public <T extends ElasticsearchId> T findById(String index, String id, Class<T> clazz) {
 		GetResponse response = findById(index, id);
 		try {
-			if (response.getSourceAsString() == null) {
+			if (response == null || org.elasticsearch.common.Strings.isNullOrEmpty(response.getSourceAsString())) {
 				return null;
 			}
 			return mapper.readValue(response.getSourceAsString(), clazz);
