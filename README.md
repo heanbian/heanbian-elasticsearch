@@ -22,8 +22,7 @@ Elasticsearch 7.13.0
 
 ```
 String connectionString = "elasticsearch://<username>:<password>@<ip1>:<port1>,<ip2>:<port2>";
+ElasticsearchTemplate esTemplate = new ElasticsearchTemplate(connectionString);
 ```
-
-> ElasticsearchTemplate
 
 说明：暂无。
