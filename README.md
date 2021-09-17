@@ -2,7 +2,7 @@
 
 ## 依赖条件
 
-JDK 11
+JDK 17
 
 Elasticsearch 7.14.1
 
@@ -14,7 +14,7 @@ Elasticsearch 7.14.1
 <dependency>
   <groupId>com.heanbian.block</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>1.1.8</version>
+  <version>1.1.9</version>
 </dependency>
 ```
 
