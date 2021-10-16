@@ -4,7 +4,7 @@
 
 JDK 17
 
-Elasticsearch 7.15.0
+Elasticsearch 7.15.1
 
 ## pom.xml
 
