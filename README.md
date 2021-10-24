@@ -14,7 +14,7 @@ Elasticsearch 7.15.1
 <dependency>
   <groupId>com.heanbian.block</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>1.1.12</version>
+  <version>1.1.14</version>
 </dependency>
 ```
 
