@@ -4,7 +4,7 @@
 
 JDK 17
 
-Elasticsearch 7.15.2
+Elasticsearch 7.16.0
 
 ## pom.xml
 
@@ -14,7 +14,7 @@ Elasticsearch 7.15.2
 <dependency>
   <groupId>com.heanbian.block</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>1.1.15</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 

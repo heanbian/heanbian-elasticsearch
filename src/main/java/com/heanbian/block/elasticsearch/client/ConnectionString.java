@@ -7,6 +7,8 @@ import static org.apache.http.auth.AuthScope.ANY;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +21,17 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
-import org.elasticsearch.client.RestHighLevelClient;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 
 public class ConnectionString {
 
@@ -80,7 +92,7 @@ public class ConnectionString {
 		return connectionString;
 	}
 
-	public RestHighLevelClient getRestHighLevelClient() {
+	public ElasticsearchClient getElasticsearchClient() {
 		ConnectionString conn = this;
 		List<String> nodes = conn.getHosts();
 		final int size = nodes.size();
@@ -106,7 +118,24 @@ public class ConnectionString {
 			});
 		}
 
-		return new RestHighLevelClient(rb);
+		ElasticsearchTransport transport = new RestClientTransport(rb.build(),
+				new JacksonJsonpMapper(defaultObjectMapper()));
+
+		return new ElasticsearchClient(transport);
+	}
+
+	private ObjectMapper defaultObjectMapper() {
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		JavaTimeModule module = new JavaTimeModule();
+		module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(f));
+
+		ObjectMapper om = new ObjectMapper();
+		om.registerModules(module);
+		om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		return om;
 	}
 
 	private List<String> parseHosts(final List<String> rawHosts) {
