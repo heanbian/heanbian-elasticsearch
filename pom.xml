@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.heanbian.block</groupId>
+	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>2.1.2</version>
+	<version>1.0.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>heanbian-elasticsearch</name>
 	<url>https://github.com/heanbian/heanbian-elasticsearch</url>
-	<description>Heanbian elasticsearch component.</description>
+	<description>heanbian-elasticsearch</description>
 	<inceptionYear>2019</inceptionYear>
 
 	<licenses>
