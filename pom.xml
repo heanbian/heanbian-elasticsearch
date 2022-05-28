@@ -158,7 +158,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.1.2</elasticsearch.version>
+		<elasticsearch.version>8.2.1</elasticsearch.version>
 	</properties>
 
 	<dependencies>
