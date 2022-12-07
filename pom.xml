@@ -5,7 +5,7 @@
 
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>1.0.0.1</version>
+	<version>10</version>
 	<packaging>jar</packaging>
 
 	<name>heanbian-elasticsearch</name>
@@ -59,7 +59,7 @@
 		</repository>
 	</repositories>
 
-	<profiles>
+		<profiles>
 		<profile>
 			<id>sonatype-oss-release</id>
 			<build>
@@ -90,7 +90,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.3.2</version>
+						<version>3.4.1</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -124,7 +124,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -132,7 +132,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.0-M5</version>
+					<version>3.0.0-M7</version>
 					<configuration>
 						<mavenExecutorId>forked-path</mavenExecutorId>
 						<useReleaseProfile>false</useReleaseProfile>
@@ -158,8 +158,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.2.3</elasticsearch.version>
-		<jackson.version>2.13.3</jackson.version>
+		<elasticsearch.version>8.5.2</elasticsearch.version>
+		<jackson.version>2.14.1</jackson.version>
 	</properties>
 
 	<dependencies>
