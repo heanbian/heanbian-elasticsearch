@@ -201,7 +201,7 @@ public class ElasticsearchTemplate {
 	}
 
 	public OpenPointInTimeResponse pit(String index, String keepAlive) {
-		return pit(OpenPointInTimeRequest.of(b -> b.index(index).ignoreUnavailable(true).keepAlive(f -> f.time("5m"))));
+		return pit(OpenPointInTimeRequest.of(b -> b.index(index).ignoreUnavailable(true).keepAlive(f -> f.time(keepAlive))));
 	}
 
 	public OpenPointInTimeResponse pit(OpenPointInTimeRequest request) {
