@@ -158,8 +158,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.6.0</elasticsearch.version>
-		<jackson.version>2.14.1</jackson.version>
+		<elasticsearch.version>8.6.2</elasticsearch.version>
+		<jackson.version>2.14.2</jackson.version>
 	</properties>
 
 	<dependencies>
