@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -51,21 +52,27 @@ import co.elastic.clients.transport.endpoints.BooleanResponse;
 public class ElasticsearchTemplate {
 
 	private final ElasticsearchClient client;
+	private final ElasticsearchAsyncClient asyncClient;
 
 	public ElasticsearchTemplate(String connectionString) {
 		this(new ConnectionString(connectionString));
 	}
 
-	public ElasticsearchTemplate(ConnectionString connectionString) {
-		this(connectionString.getElasticsearchClient());
+	public ElasticsearchTemplate(ConnectionString cs) {
+		this(cs.getElasticsearchClient(), cs.getElasticsearchAsyncClient());
 	}
 
-	public ElasticsearchTemplate(ElasticsearchClient client) {
+	public ElasticsearchTemplate(ElasticsearchClient client, ElasticsearchAsyncClient asyncClient) {
 		this.client = client;
+		this.asyncClient = asyncClient;
 	}
 
 	public ElasticsearchClient getElasticsearchClient() {
 		return client;
+	}
+
+	public ElasticsearchAsyncClient getElasticsearchAsyncClient() {
+		return asyncClient;
 	}
 
 	public CountResponse count(Query q, String... index) {
@@ -201,7 +208,8 @@ public class ElasticsearchTemplate {
 	}
 
 	public OpenPointInTimeResponse pit(String index, String keepAlive) {
-		return pit(OpenPointInTimeRequest.of(b -> b.index(index).ignoreUnavailable(true).keepAlive(f -> f.time(keepAlive))));
+		return pit(OpenPointInTimeRequest
+				.of(b -> b.index(index).ignoreUnavailable(true).keepAlive(f -> f.time(keepAlive))));
 	}
 
 	public OpenPointInTimeResponse pit(OpenPointInTimeRequest request) {

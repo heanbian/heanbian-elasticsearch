@@ -28,9 +28,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 
 public class ConnectionString {
@@ -93,6 +93,14 @@ public class ConnectionString {
 	}
 
 	public ElasticsearchClient getElasticsearchClient() {
+		return new ElasticsearchClient(getRestClientTransport());
+	}
+
+	public ElasticsearchAsyncClient getElasticsearchAsyncClient() {
+		return new ElasticsearchAsyncClient(getRestClientTransport());
+	}
+
+	public RestClientTransport getRestClientTransport() {
 		ConnectionString conn = this;
 		List<String> nodes = conn.getHosts();
 		final int size = nodes.size();
@@ -118,10 +126,7 @@ public class ConnectionString {
 			});
 		}
 
-		ElasticsearchTransport transport = new RestClientTransport(rb.build(),
-				new JacksonJsonpMapper(defaultObjectMapper()));
-
-		return new ElasticsearchClient(transport);
+		return new RestClientTransport(rb.build(), new JacksonJsonpMapper(defaultObjectMapper()));
 	}
 
 	private ObjectMapper defaultObjectMapper() {
