@@ -14,7 +14,7 @@ Elasticsearch 8.8.0
 <dependency>
   <groupId>com.heanbian</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>14</version>
+  <version>14.1</version>
 </dependency>
 ```
 
