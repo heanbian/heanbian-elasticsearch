@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>14.1</version>
+	<version>15.0</version>
 	<packaging>jar</packaging>
 	<name>heanbian-elasticsearch</name>
 	<url>https://github.com/heanbian/heanbian-elasticsearch</url>
@@ -147,7 +147,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.8.0</elasticsearch.version>
+		<elasticsearch.version>8.8.1</elasticsearch.version>
 		<jackson.version>2.15.2</jackson.version>
 	</properties>
 	<dependencies>
