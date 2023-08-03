@@ -4,7 +4,7 @@
 
 JDK 17
 
-Elasticsearch 8.8.1
+Elasticsearch 8.8.2
 
 ## pom.xml
 
