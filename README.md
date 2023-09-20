@@ -2,9 +2,9 @@
 
 ## 依赖条件
 
-JDK 17
+JDK 21
 
-Elasticsearch 8.10.0
+Elasticsearch 8.10.1
 
 ## pom.xml
 
@@ -14,7 +14,7 @@ Elasticsearch 8.10.0
 <dependency>
   <groupId>com.heanbian</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>16.1</version>
+  <version>17.1</version>
 </dependency>
 ```
 
