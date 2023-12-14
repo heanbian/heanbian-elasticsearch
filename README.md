@@ -4,7 +4,7 @@
 
 JDK 21
 
-Elasticsearch 8.11.1
+Elasticsearch 8.11.2
 
 ## pom.xml
 
@@ -14,7 +14,7 @@ Elasticsearch 8.11.1
 <dependency>
   <groupId>com.heanbian</groupId>
   <artifactId>heanbian-elasticsearch</artifactId>
-  <version>18.1</version>
+  <version>19.1</version>
 </dependency>
 ```
 

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>18.1</version>
+	<version>19.1</version>
 	<packaging>jar</packaging>
 	<name>heanbian-elasticsearch</name>
 	<url>https://github.com/heanbian/heanbian-elasticsearch</url>
@@ -82,7 +82,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.6.0</version>
+						<version>3.6.3</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -147,7 +147,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.11.1</elasticsearch.version>
+		<elasticsearch.version>8.11.2</elasticsearch.version>
 		<jackson.version>2.16.0</jackson.version>
 	</properties>
 	<dependencies>
