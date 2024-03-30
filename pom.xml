@@ -147,7 +147,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.12.2</elasticsearch.version>
+		<elasticsearch.version>8.13.0</elasticsearch.version>
 		<jackson.version>2.17.0</jackson.version>
 	</properties>
 	<dependencies>
