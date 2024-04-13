@@ -30,8 +30,10 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</connection>
-		<developerConnection>scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</developerConnection>
+		<connection>
+			scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</connection>
+		<developerConnection>
+			scm:git:https://github.com/heanbian/heanbian-elasticsearch.git</developerConnection>
 		<url>https://github.com/heanbian/heanbian-elasticsearch</url>
 	</scm>
 	<issueManagement>
@@ -59,7 +61,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.11.0</version>
+						<version>3.13.0</version>
 						<configuration>
 							<encoding>UTF-8</encoding>
 							<source>21</source>
@@ -69,7 +71,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.3.0</version>
+						<version>3.3.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -95,7 +97,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.2.0</version>
+						<version>3.2.3</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -147,7 +149,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.13.0</elasticsearch.version>
+		<elasticsearch.version>8.13.2</elasticsearch.version>
 		<jackson.version>2.17.0</jackson.version>
 	</properties>
 	<dependencies>
