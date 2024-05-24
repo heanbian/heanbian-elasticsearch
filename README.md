@@ -4,7 +4,7 @@
 
 JDK 21
 
-Elasticsearch 8.13.2
+Elasticsearch 8.13.4
 
 ## pom.xml
 

@@ -97,7 +97,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.2.3</version>
+						<version>3.2.4</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -149,8 +149,8 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<elasticsearch.version>8.13.2</elasticsearch.version>
-		<jackson.version>2.17.0</jackson.version>
+		<elasticsearch.version>8.13.4</elasticsearch.version>
+		<jackson.version>2.17.1</jackson.version>
 	</properties>
 	<dependencies>
 		<dependency>
