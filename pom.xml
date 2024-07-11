@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.heanbian</groupId>
 	<artifactId>heanbian-elasticsearch</artifactId>
-	<version>20.2</version>
+	<version>20.3</version>
 	<packaging>jar</packaging>
 	<name>heanbian-elasticsearch</name>
 	<url>https://github.com/heanbian/heanbian-elasticsearch</url>
