@@ -3,6 +3,7 @@
 == 依赖条件
 
 JDK : 21
+
 Elasticsearch : 8.15.0
 
 == pom.xml
