@@ -1,10 +1,11 @@
 = heanbian-elasticsearch
 
-== 依赖条件
+== 使用说明
 
 |===
 | JDK | 21 
 | Elasticsearch | 8.15.0
+| heanbian-elasticsearch | 21.2
 |===
 
 == pom.xml
